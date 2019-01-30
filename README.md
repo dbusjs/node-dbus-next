@@ -2,7 +2,7 @@
 
 The next great DBus library for NodeJS.
 
-*This project is unreleased and is not ready to be used.*
+*This project is under development and may make breaking changes in micro versions*
 
 ## About
 
