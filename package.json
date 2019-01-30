@@ -33,7 +33,7 @@
     "url": "http://github.com/acrisci/node-dbus-next.git"
   },
   "dependencies": {
-    "event-stream": "^4.0.0",
+    "event-stream": "3.3.4",
     "hexy": "^0.2.10",
     "long": "^4.0.0",
     "optimist": "^0.6.1",
