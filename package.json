@@ -35,7 +35,6 @@
   "dependencies": {
     "event-stream": "3.3.4",
     "hexy": "^0.2.10",
-    "long": "^4.0.0",
     "optimist": "^0.6.1",
     "put": "0.0.6",
     "safe-buffer": "^5.1.1",
@@ -48,6 +47,7 @@
     "@babel/core": "^7.1.5",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-decorators": "^7.1.2",
+    "@babel/plugin-syntax-bigint": "^7.2.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "commander": "^2.19.0",
