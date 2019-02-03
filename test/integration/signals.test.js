@@ -2,7 +2,7 @@
 
 let dbus = require('../../');
 let Variant = dbus.Variant;
-let MethodError = dbus.MethodError;
+let DBusError = dbus.DBusError;
 
 let {
   Interface, property, method, signal,

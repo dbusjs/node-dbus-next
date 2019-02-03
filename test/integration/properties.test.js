@@ -4,16 +4,32 @@ let dbus = require('../../');
 let Variant = dbus.Variant;
 
 let {
-  Interface, property, method, signal, MethodError,
+  Interface, property, method, signal, DBusError,
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
 const TEST_NAME = 'org.test.name';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
+const USER_ERROR_IFACE = 'org.test.usererror';
 const INVALID_ARGS = 'org.freedesktop.DBus.Error.InvalidArgs'
 
 let bus = dbus.sessionBus();
+
+class UserErrorInterface extends Interface {
+  constructor(name) {
+    super(name);
+  }
+
+  @property({signature: 's'})
+  get UserErrorProperty() {
+    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error')
+  }
+
+  set UserErrorProperty(what) {
+    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error')
+  }
+}
 
 class TestInterface extends Interface {
   constructor(name) {
@@ -57,16 +73,18 @@ class TestInterface extends Interface {
 }
 
 let testIface = new TestInterface(TEST_IFACE);
+let userErrorIface = new UserErrorInterface(USER_ERROR_IFACE);
 
 beforeAll(async () => {
   await bus.export(TEST_NAME, TEST_PATH, testIface);
+  await bus.export(TEST_NAME, TEST_PATH, userErrorIface);
 });
 
 afterAll(() => {
   bus.connection.stream.end();
 });
 
-test('test simple property get and set', async () => {
+test('simple property get and set', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
 
   let test = object.getInterface(TEST_IFACE);
@@ -105,7 +123,7 @@ test('test simple property get and set', async () => {
   expect(all).toHaveProperty('VariantProperty', new Variant('v', testIface.VariantProperty));
 });
 
-test('test complicated property get and set', async () => {
+test('complicated property get and set', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let properties = object.getInterface('org.freedesktop.DBus.Properties');
   let prop = await properties.Get(TEST_IFACE, 'ComplicatedProperty');
@@ -131,7 +149,7 @@ test('test complicated property get and set', async () => {
   expect(prop.value).toEqual(updatedProp);
 });
 
-test('test properties changed signal', async () => {
+test('properties changed signal', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let properties = object.getInterface('org.freedesktop.DBus.Properties');
   let onPropertiesChanged = jest.fn((iface, changed, invalidated) => {
@@ -146,30 +164,40 @@ test('test properties changed signal', async () => {
   expect(onPropertiesChanged).toHaveBeenCalledWith(TEST_IFACE, e, [ 'invalid' ]);
 });
 
-test('test read and write access', async () => {
+test('read and write access', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let properties = object.getInterface('org.freedesktop.DBus.Properties');
 
   let req = properties.Get(TEST_IFACE, 'WriteOnly');
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 
   req = properties.Set(TEST_IFACE, 'ReadOnly', new Variant('s', 'foo'));
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 });
 
-test('test properties interface specific errors', async () => {
+test('properties interface specific errors', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let properties = object.getInterface('org.freedesktop.DBus.Properties');
 
   let req = properties.Set('not.an.interface', 'ReadOnly', new Variant('s', 'foo'));
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 
   req = properties.Get(TEST_IFACE, 'NotAProperty');
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 
   req = properties.Set(TEST_IFACE, 'NotAProperty', new Variant('s', 'foo'));
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 
   req = properties.Set(TEST_IFACE, 'WriteOnly', new Variant('as', ['wrong', 'type']));
-  await expect(req).rejects.toBeInstanceOf(MethodError);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
+
+  // user errors
+  req = properties.Get(USER_ERROR_IFACE, 'UserErrorProperty');
+  await expect(req).rejects.toBeInstanceOf(DBusError);
+
+  req = properties.Set(USER_ERROR_IFACE, 'UserErrorProperty', new Variant('s', 'foo'));
+  await expect(req).rejects.toBeInstanceOf(DBusError);
+
+  req = properties.GetAll(USER_ERROR_IFACE);
+  await expect(req).rejects.toBeInstanceOf(DBusError);
 });

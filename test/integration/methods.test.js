@@ -2,7 +2,7 @@
 
 let dbus = require('../../');
 let Variant = dbus.Variant;
-let MethodError = dbus.MethodError;
+let DBusError = dbus.DBusError;
 
 let {
   Interface, property, method, signal,
@@ -28,7 +28,7 @@ class MethodsInterface extends Interface {
 
   @method({inSignature: '', outSignature: ''})
   ThrowsError() {
-    throw new MethodError('org.test.iface.Error', 'something went wrong');
+    throw new DBusError('org.test.iface.Error', 'something went wrong');
   }
 
   complicated1 = [
@@ -104,7 +104,7 @@ test('test that methods work correctly', async () => {
   expect(r2).toEqual(testIface.complicated2);
 
   let req = test.ThrowsError();
-  let expected = new MethodError('org.test.iface.Error', 'something went wrong');
+  let expected = new DBusError('org.test.iface.Error', 'something went wrong');
   await expect(req).rejects.toEqual(expected);
 });
 
