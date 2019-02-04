@@ -2,17 +2,13 @@
 
 The next great DBus library for NodeJS.
 
-*This project is under development and may make breaking changes in micro versions*
+*This project is under development and may make breaking changes in minor versions until 1.0*
 
 ## About
 
-dbus-next is a fork of the wonderful [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is fantastic, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but this project requires compiling C code and similarly does not provide enough features to create full-featured DBus services.
+dbus-next is a fully featured high level library for DBus geared primarily towards integration of applications into Linux desktop and mobile environments.
 
-Here are some goals for the project:
-
-* Update the client interface with a modern ES6 interface
-* Redesign the service interface
-* Fix some outstanding bugs on the issue tracker
+dbus-next is a fork of [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is great, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but this project requires compiling C code and similarly does not provide enough features to create full-featured DBus services.
 
 ## The Client Interface
 
@@ -149,15 +145,10 @@ To emit a signal, just call the method marked with the `signal` decorator and th
 
 Contributions are welcome. There's alot to do! Look at the issue tracker for [dbus-native](https://github.com/sidorares/dbus-native) for all those tricky bugs that require breaking the interface. I'll be pulling in a lot of outstanding pull requests from the project as well.
 
-TODO:
-
-* Redesign the client interface
-* Complete implementation of the server interface
-* Fix bugs
-
 ## Copyright
 
 You can use this code under an MIT license (see LICENSE).
 
 © 2012, Andrey Sidorov
+
 © 2018, Tony Crisci
