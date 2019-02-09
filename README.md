@@ -2,13 +2,13 @@
 
 The next great DBus library for NodeJS.
 
-*This project is under development and may make breaking changes in minor versions until 1.0*
+*This project is under development and may make breaking changes in minor versions until 1.0.*
 
 ## About
 
 dbus-next is a fully featured high level library for DBus geared primarily towards integration of applications into Linux desktop and mobile environments.
 
-Desktop application developers can use this library to that will allow better integration into desktop environments by implementing common DBus standard interfaces.
+Desktop application developers can use this library for integrating their applications into desktop environments by implementing common DBus standard interfaces or creating custom plugin interfaces.
 
 Desktop users can use this library to create their own scripts and utilities to interact with those interfaces for customization of their desktop environment.
 
