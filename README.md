@@ -8,7 +8,9 @@ The next great DBus library for NodeJS.
 
 dbus-next is a fully featured high level library for DBus geared primarily towards integration of applications into Linux desktop and mobile environments.
 
-dbus-next is a fork of [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is great, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but this project requires compiling C code and similarly does not provide enough features to create full-featured DBus services.
+Desktop application developers can use this library to that will allow better integration into desktop environments by implementing common DBus standard interfaces.
+
+Desktop users can use this library to create their own scripts and utilities to interact with those interfaces for customization of their desktop environment.
 
 ## The Client Interface
 
@@ -63,7 +65,7 @@ let dbus = require('dbus-next');
 let Variant = dbus.Variant;
 
 let {
-  Interface, property, method, signal, MethodError,
+  Interface, property, method, signal, DBusError,
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
@@ -106,7 +108,8 @@ class ExampleInterface extends Interface {
 
   @method({inSignature: '', outSignature: ''})
   ThrowsError() {
-    throw new MethodError('org.test.iface.Error', 'something went wrong');
+    // the error is returned to the client
+    throw new DBusError('org.test.iface.Error', 'something went wrong');
   }
 
   @signal({signature: 's'})
@@ -126,10 +129,12 @@ class ExampleInterface extends Interface {
 let example = new ExampleInterface('org.test.iface');
 
 setTimeout(() => {
-  // emit the HelloWorld signal
+  // emit the HelloWorld signal by calling the method with the parameters to
+  // send to the listeners
   example.HelloWorld('hello');
 }, 500);
 
+// export the interface on the bus at the given name and object path
 bus.export('org.test.name',
            '/org/test/path',
            example);
@@ -143,7 +148,11 @@ To emit a signal, just call the method marked with the `signal` decorator and th
 
 ## Contributing
 
-Contributions are welcome. There's alot to do! Look at the issue tracker for [dbus-native](https://github.com/sidorares/dbus-native) for all those tricky bugs that require breaking the interface. I'll be pulling in a lot of outstanding pull requests from the project as well.
+Contributions are welcome. Development happens on [Github](https://github.com/acrisci/node-dbus-next).
+
+## Similar Projects
+
+dbus-next is a fork of [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is great, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but this project requires compiling C code and similarly does not provide enough features to create full-featured DBus services.
 
 ## Copyright
 
