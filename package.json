@@ -35,7 +35,6 @@
   "dependencies": {
     "event-stream": "3.3.4",
     "hexy": "^0.2.10",
-    "optimist": "^0.6.1",
     "put": "0.0.6",
     "safe-buffer": "^5.1.1",
     "xml2js": "^0.4.17"
@@ -64,11 +63,11 @@
   },
   "scripts": {
     "lint": "npm run lint:docs && npm run lint:code",
-    "lint:code": "eslint index.js 'bin/*.js' 'lib/**/*.js' 'test/**/*.js'",
+    "lint:code": "eslint index.js 'lib/**/*.js' 'test/**/*.js'",
     "lint:docs": "eslint 'examples/**/*.js'",
     "test": "npm run lint && npm run test:raw",
     "test:raw": "mocha",
-    "prettier": "prettier --write index.js '{bin,lib,examples,test}/**/*.js'",
+    "prettier": "prettier --write index.js '{lib,examples,test}/**/*.js'",
     "prettier:docs": "prettier-markdown README.md",
     "eslint-check": "eslint --print-config .eslintrc | eslint-config-prettier-check",
     "integration": "dbus-run-session -- jest ./test/integration",
