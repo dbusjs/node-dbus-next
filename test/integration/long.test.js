@@ -8,9 +8,14 @@ let {
 } = dbus.interface;
 
 let {
-  MAX_INT64, MIN_INT64,
-  MAX_UINT64, MIN_UINT64
+  MAX_INT64_STR, MIN_INT64_STR,
+  MAX_UINT64_STR, MIN_UINT64_STR
 } = require('../../lib/constants');
+
+const MAX_INT64 = BigInt(MAX_INT64_STR);
+const MIN_INT64 = BigInt(MIN_INT64_STR);
+const MAX_UINT64 = BigInt(MAX_UINT64_STR);
+const MIN_UINT64 = BigInt(MIN_UINT64_STR);
 
 const TEST_NAME = 'org.test.name';
 const TEST_PATH = '/org/test/path';
