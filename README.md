@@ -97,7 +97,7 @@ class ExampleInterface extends Interface {
   set MapProperty(value) {
     this._MapProperty = value;
 
-    this.PropertiesChanged({
+    Interface.emitPropertiesChanged(this, {
       MapProperty: value
     });
   }

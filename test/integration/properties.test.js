@@ -60,7 +60,7 @@ class TestInterface extends Interface {
   }
   set NotifyingProperty(value) {
     this._NotifyingProperty = value;
-    this.PropertiesChanged({
+    Interface.emitPropertiesChanged(this, {
       NotifyingProperty: value
     }, ['invalid']);
   }
