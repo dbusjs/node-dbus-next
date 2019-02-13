@@ -35,6 +35,7 @@
   "dependencies": {
     "event-stream": "3.3.4",
     "hexy": "^0.2.10",
+    "jsbi": "^2.0.5",
     "put": "0.0.6",
     "safe-buffer": "^5.1.1",
     "xml2js": "^0.4.17"
