@@ -1,5 +1,11 @@
 // Test that methods and properties of type 'x' (long int) work correctly
 
+if (typeof BigInt !== 'function') {
+  // skip these tests if BigInt is not supported
+  BigInt = function(){};
+  test = test.skip;
+}
+
 let dbus = require('../../');
 
 let {
@@ -50,12 +56,12 @@ test('test long type works correctly', async () => {
   let test = object.getInterface(TEST_IFACE);
 
   // small numbers
-  let what = -30n;
+  let what = BigInt(-30);
   let result = await test.EchoSigned(what);
   // XXX jest does not support bigint yet
   expect(result === what).toEqual(true);
 
-  what = 30n;
+  what = BigInt(30);
   result = await test.EchoUnsigned(what);
   expect(result === what).toEqual(true);
   result = await test.EchoSigned(what);

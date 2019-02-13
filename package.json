@@ -60,6 +60,6 @@
     "test": "dbus-run-session -- jest"
   },
   "engine": {
-    "node": ">=4.0"
+    "node": ">=8.2.1"
   }
 }

@@ -157,6 +157,8 @@ module.exports.createServer = server.createServer;
 // new stuff
 const variant = require('./lib/service/variant');
 const iface = require('./lib/service/interface');
+// use a polyfill for bigint
+module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompat
 module.exports.interface = iface;
 module.exports.Variant = variant.Variant;
 // TODO move me off the interface
