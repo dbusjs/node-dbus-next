@@ -88,7 +88,7 @@ let echoVariant = new Variant('a{sv}', {
   ])
 });
 
-test('test that methods work correctly', async () => {
+test('that methods work correctly', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let test = object.getInterface(TEST_IFACE);
 
@@ -108,7 +108,7 @@ test('test that methods work correctly', async () => {
   await expect(req).rejects.toEqual(expected);
 });
 
-test('test client method errors', async () => {
+test('client method errors', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let test = object.getInterface(TEST_IFACE);
 
