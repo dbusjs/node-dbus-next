@@ -14,7 +14,7 @@ Desktop users can use this library to create their own scripts and utilities to 
 
 ## Node Compatibility
 
-As of now, dbus-next targets the latest features of JavaScript. The earliest version supported is `8.2.1`. However, by default the library uses `BigInt` by default for the long integer types which was introduced in `10.8.0`. If you need to support versions earlier than this, set BigInt compatibility mode. This will configure the library to use [JSBI](https://github.com/GoogleChromeLabs/jsbi) as a polyfill for long types.
+As of now, dbus-next targets the latest features of JavaScript. The earliest version supported is `8.2.1`. However, the library uses `BigInt` by default for the long integer types which was introduced in `10.8.0`. If you need to support versions earlier than this, set BigInt compatibility mode. This will configure the library to use [JSBI](https://github.com/GoogleChromeLabs/jsbi) as a polyfill for long types.
 
 ```javascript
 const dbus = require('dbus-next');
