@@ -51,7 +51,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "commander": "^2.19.0",
-    "jest": "^23.6.0"
+    "jest": "^24.1.0"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",
