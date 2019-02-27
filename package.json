@@ -51,13 +51,15 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "commander": "^2.19.0",
-    "jest": "^24.1.0"
+    "jest": "^24.1.0",
+    "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",
     "coverage": "dbus-run-session -- jest --coverage",
     "unit": "jest ./test/*.test.js",
-    "test": "dbus-run-session -- jest"
+    "test": "dbus-run-session -- jest",
+    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib"
   },
   "engine": {
     "node": ">=8.2.1"

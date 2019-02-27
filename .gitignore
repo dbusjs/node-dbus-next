@@ -11,6 +11,7 @@ pids
 logs
 results
 /coverage
+/out
 
 node_modules
 npm-debug.log
