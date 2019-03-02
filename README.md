@@ -155,6 +155,8 @@ Methods are called when a DBus client calls that method on the server. Propertie
 
 To emit a signal, just call the method marked with the `signal` decorator and the signal will be emitted with the returned value.
 
+If you have an interface xml description, which can be gotten from the `org.freedesktop.DBus.Introspect` method on an exported interface, you can generate dbus-next JavaScript classes from the xml file with the `bin/generate-interfaces.js` utility.
+
 ## Contributing
 
 Contributions are welcome. Development happens on [Github](https://github.com/acrisci/node-dbus-next).

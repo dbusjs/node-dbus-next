@@ -51,6 +51,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "commander": "^2.19.0",
+    "handlebars": "^4.1.0",
     "jest": "^24.1.0",
     "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git"
   },
