@@ -48,8 +48,11 @@
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-decorators": "^7.1.2",
     "@babel/plugin-syntax-bigint": "^7.2.0",
+    "@babel/plugin-transform-async-to-generator": "^7.3.4",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
     "commander": "^2.19.0",
     "handlebars": "^4.1.0",
     "jest": "^24.1.0",
@@ -63,6 +66,6 @@
     "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib"
   },
   "engine": {
-    "node": ">=8.2.1"
+    "node": ">=6.3.0"
   }
 }
