@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+
+This version introduces changes for compatibility with node version 6.3.0 and adds the generate-interfaces.js utility.
+
 ## v0.2.0
 
 This version contains breaking changes and new features.
