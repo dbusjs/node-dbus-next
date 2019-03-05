@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1
+
+Export dbus interface and member validators.
+
 ## v0.2.1
 
 This version introduces changes for compatibility with node version 6.3.0 and adds the generate-interfaces.js utility.
