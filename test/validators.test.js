@@ -1,8 +1,9 @@
+let dbus = require('../');
 const {
   isObjectPathValid,
   isInterfaceNameValid,
   isMemberNameValid
-} = require('../lib/validators');
+} = dbus.validators;
 
 test('object path validators', () => {
   let validPaths = [ '/', '/foo', '/foo/bar', '/foo/bar/bat' ];

@@ -161,5 +161,6 @@ const iface = require('./lib/service/interface');
 module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompat
 module.exports.interface = iface;
 module.exports.Variant = variant.Variant;
+module.exports.validators = require('./lib/validators');
 // TODO move me off the interface
 module.exports.DBusError = iface.DBusError;
