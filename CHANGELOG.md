@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.2
+
+* Add bus name validators
+* bugfix: allow "-" in bus names
+* bugfix: Use Long.js internally to fix issues with sending and receiving negative numbers
+
 ## v0.3.1
 
 Export dbus interface and member validators.
