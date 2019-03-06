@@ -1,5 +1,6 @@
 let dbus = require('../');
 const {
+  isBusNameValid,
   isObjectPathValid,
   isInterfaceNameValid,
   isMemberNameValid
@@ -18,12 +19,25 @@ test('object path validators', () => {
 });
 
 test('bus name validators', () => {
+  let validNames = [ 'foo.bar', 'foo.bar.bat', '_foo._bar', 'foo.bar69', 'foo.bar-69', 'org.mpris.MediaPlayer2.google-play-desktop-player' ];
+  for (name of validNames) {
+    expect(isBusNameValid(name)).toBe(true);
+  }
+
+  let invalidNames = [ undefined, {}, '', '5foo.bar', 'foo.6bar', '.foo.bar', 'bar..baz', '$foo.bar', 'foo$.ba$r' ];
+  for (name of invalidNames) {
+    expect(isBusNameValid(name)).toBe(false);
+  }
+
+});
+
+test('interface name validators', () => {
   let validNames = [ 'foo.bar', 'foo.bar.bat', '_foo._bar', 'foo.bar69' ];
   for (name of validNames) {
     expect(isInterfaceNameValid(name)).toBe(true);
   }
 
-  let invalidNames = [ undefined, {}, '', '5foo.bar', 'foo.6bar', '.foo.bar', 'bar..baz', '$foo.bar', 'foo$.ba$r' ];
+  let invalidNames = [ undefined, {}, '', '5foo.bar', 'foo.6bar', '.foo.bar', 'bar..baz', '$foo.bar', 'foo$.ba$r', 'org.mpris.MediaPlayer2.google-play-desktop-player' ];
   for (name of invalidNames) {
     expect(isInterfaceNameValid(name)).toBe(false);
   }
