@@ -9,6 +9,7 @@ const clientHandshake = require('./lib/handshake');
 const serverHandshake = require('./lib/server-handshake');
 const MessageBus = require('./lib/bus');
 const server = require('./lib/server');
+const {getDbusAddressFromFs} = require('./lib/address-x11');
 
 function createStream(opts) {
   if (opts.stream) return opts.stream;
@@ -18,8 +19,15 @@ function createStream(opts) {
   if (socket) return net.createConnection(socket);
   if (port) return net.createConnection(port, host);
 
-  var busAddress = opts.busAddress || process.env.DBUS_SESSION_BUS_ADDRESS;
-  if (!busAddress) throw new Error('unknown bus address');
+  // XXX according to the dbus spec, we should start a new server if the bus
+  // address cannot be found.
+  var busAddress = opts.busAddress;
+  if (!busAddress) {
+    busAddress = process.env.DBUS_SESSION_BUS_ADDRESS;
+  }
+  if (!busAddress) {
+    busAddress = getDbusAddressFromFs();
+  }
 
   var addresses = busAddress.split(';');
   for (var i = 0; i < addresses.length; ++i) {
