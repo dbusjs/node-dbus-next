@@ -10,6 +10,7 @@ const serverHandshake = require('./lib/server-handshake');
 const MessageBus = require('./lib/bus');
 const server = require('./lib/server');
 const {getDbusAddressFromFs} = require('./lib/address-x11');
+const errors = require('./lib/errors');
 
 function createStream(opts) {
   if (opts.stream) return opts.stream;
@@ -158,6 +159,12 @@ module.exports.sessionBus = function(opts) {
 };
 
 module.exports.messageType = constants.messageType;
+
+// name flags
+module.exports.DBUS_NAME_FLAG_ALLOW_REPLACEMENT = constants.DBUS_NAME_FLAG_ALLOW_REPLACEMENT;
+module.exports.DBUS_NAME_FLAG_REPLACE_EXISTING = constants.DBUS_NAME_FLAG_REPLACE_EXISTING;
+module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUEUE;
+
 module.exports.createConnection = createConnection;
 
 module.exports.createServer = server.createServer;
@@ -170,5 +177,5 @@ module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompa
 module.exports.interface = iface;
 module.exports.Variant = variant.Variant;
 module.exports.validators = require('./lib/validators');
-// TODO move me off the interface
-module.exports.DBusError = iface.DBusError;
+module.exports.DBusError = errors.DBusError;
+module.exports.NameExistsError = errors.NameExistsError;

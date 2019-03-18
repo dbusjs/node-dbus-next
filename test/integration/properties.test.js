@@ -1,10 +1,11 @@
 // Test the server properties interface works correctly.
 
-let dbus = require('../../');
-let Variant = dbus.Variant;
+const dbus = require('../../');
+const Variant = dbus.Variant;
+const DBusError = dbus.DBusError;
 
 let {
-  Interface, property, method, signal, DBusError,
+  Interface, property, method, signal,
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 

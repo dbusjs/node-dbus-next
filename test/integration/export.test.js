@@ -1,10 +1,12 @@
-let dbus = require('../../');
-let Variant = dbus.Variant;
+const dbus = require('../../');
+const Variant = dbus.Variant;
 
-let {
+const {
   Interface, property, method, signal,
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
+
+const NameExistsError = dbus.NameExistsError;
 
 const TEST_NAME = 'org.test.name';
 const TEST_PATH = '/org/test/path';
@@ -161,6 +163,11 @@ test('export a name taken by another bus and queue', async () => {
   ]);
   expect(names).toEqual(expect.arrayContaining([TEST_NAME1]));
   expect(obj.getInterface(TEST_IFACE2)).toBeDefined();
+
+  // passing the flag to not queue should throw an error if the name is taken
+  let req = bus.export(TEST_NAME1, TEST_PATH1, testIface1,
+                       dbus.DBUS_NAME_FLAG_DO_NOT_QUEUE);
+  await expect(req).rejects.toBeInstanceOf(NameExistsError);
 
   await bus2.unexportName(TEST_NAME1);
 });
