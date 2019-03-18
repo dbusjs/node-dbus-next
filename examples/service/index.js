@@ -77,10 +77,16 @@ setTimeout(() => {
   example.HelloWorld('hello');
 }, 500);
 
-bus.export('org.test.name',
-           '/org/test/path',
-           example);
+async function main() {
+  await bus.export('org.test.name',
+                   '/org/test/path',
+                   example);
 
-bus.export('org.test.name',
-           '/org/test/path',
-           example2);
+  await bus.export('org.test.name',
+                   '/org/test/path',
+                   example2);
+}
+
+main().catch((err) => {
+  console.log('Error:' + err);
+});
