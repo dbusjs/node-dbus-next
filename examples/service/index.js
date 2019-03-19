@@ -78,13 +78,9 @@ setTimeout(() => {
 }, 500);
 
 async function main() {
-  await bus.export('org.test.name',
-                   '/org/test/path',
-                   example);
-
-  await bus.export('org.test.name',
-                   '/org/test/path',
-                   example2);
+  let name = await bus.requestName('org.test.name');
+  name.export('/org/test/path', example);
+  name.export('/org/test/path', example2);
 }
 
 main().catch((err) => {

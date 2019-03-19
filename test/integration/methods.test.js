@@ -59,7 +59,8 @@ class MethodsInterface extends Interface {
 let testIface = new MethodsInterface(TEST_IFACE);
 
 beforeAll(async () => {
-  await bus.export(TEST_NAME, TEST_PATH, testIface);
+  let name = await bus.requestName(TEST_NAME);
+  name.export(TEST_PATH, testIface);
 });
 
 afterAll(() => {

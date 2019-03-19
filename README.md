@@ -23,6 +23,8 @@ dbus.setBigIntCompat(true);
 
 ## The Client Interface
 
+*The Client interface is somewhat stable*
+
 You can get a proxy object for a name on the bus with the `bus.getProxyObject()` function, passing the name and the path. The proxy object contains introspection data about the object including a list of nodes and interfaces. You can get an interface with the `object.getInterface()` function passing the name of the interface.
 
 The interface object has methods you can call that correspond to the methods in the introspection data. Pass normal JavaScript objects to the parameters of the function and they will automatically be converted into the advertized DBus type. However, you must use the `Variant` class to represent DBus variants.
@@ -66,6 +68,8 @@ properties.on('PropertiesChanged', (iface, changed, invalidated) => {
 For a complete example, see the [MPRIS client](https://github.com/acrisci/node-dbus-next/blob/master/examples/mpris.js) example which can be used to control media players on the command line.
 
 ## The Service Interface
+
+*The Service interface is somewhat unstable*
 
 You can use the `Interface` class to define your interfaces. This interfaces uses the proposed [decorators syntax](https://github.com/tc39/proposal-decorators) which is not yet part of the ECMAScript standard, but should be included one day. Unfortunately, you'll need a [Babel plugin](https://www.npmjs.com/package/@babel/plugin-proposal-decorators) to make this code work for now.
 
@@ -143,13 +147,19 @@ setTimeout(() => {
   example.HelloWorld('hello');
 }, 500);
 
-// export the interface on the bus at the given name and object path
-bus.export('org.test.name',
-           '/org/test/path',
-           example);
+async function main() {
+  // make a request for the name on the bus
+  let name = await bus.requestName('org.test.name');
+  // export the interface on the name
+  name.export('/org/test/path', example);
+}
+
+main().catch((err) => {
+  console.log('Error: ' + err);
+});
 ```
 
-Interfaces extend the `Interface` class. Declare service methods, properties, and signals with the decorators provided from the library. Then call `bus.export()` to export them onto the bus.
+Interfaces extend the `Interface` class. Declare service methods, properties, and signals with the decorators provided from the library. First request a name on the bus with `bus.requestName()`. Then call `name.export()` with the path and interface to expose this interface on the bus.
 
 Methods are called when a DBus client calls that method on the server. Properties can be gotten and set with the `org.freedesktop.DBus.Properties` interface and are included in the introspection xml.
 

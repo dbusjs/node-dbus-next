@@ -43,18 +43,14 @@ class ExampleInterfaceTwo extends Interface {
 let testIface1 = new ExampleInterfaceOne();
 let testIface2 = new ExampleInterfaceTwo();
 
-test('stub', async () => {
-    await bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus')
-});
-
 test('export and unexport interfaces and paths', async () => {
-  let [result, dbusObject] = await Promise.all([
-    bus.export(TEST_NAME1, TEST_PATH1, testIface1),
+  let [name, dbusObject] = await Promise.all([
+    bus.requestName(TEST_NAME1),
     bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus')
   ]);
+  name.export(TEST_PATH1, testIface1);
 
   expect(Object.keys(bus._names).length).toEqual(1);
-  expect(Object.keys(bus._nameRequests).length).toEqual(1);
 
   // export the name and make sure it's on the bus
   let dbusIface = dbusObject.getInterface('org.freedesktop.DBus');
@@ -66,56 +62,64 @@ test('export and unexport interfaces and paths', async () => {
     'org.freedesktop.DBus.Properties',
     'org.freedesktop.DBus.Introspectable'
   ];
-  for (let name of expectedIfaces) {
-    expect(obj.interfaces.find((i) => i.$name === name)).toBeDefined();
+  for (let expected of expectedIfaces) {
+    expect(obj.interfaces.find((i) => i.$name === expected)).toBeDefined();
   }
 
-  // unexport the name and make sure it leaves the bus
-  await bus.unexportName(TEST_NAME1);
+  // release the name and make sure it leaves the bus
+  await name.release();
   expect(Object.keys(bus._names).length).toEqual(0);
-  expect(Object.keys(bus._nameRequests).length).toEqual(0);
   names = await dbusIface.ListNames();
   expect(names).not.toEqual(expect.arrayContaining([TEST_NAME1]));
 
   // unexport a path and make sure it's gone
-  result = await bus.export(TEST_NAME1, TEST_PATH1, testIface1);
-  bus.unexportPath(TEST_NAME1, TEST_PATH1);
+  name = await bus.requestName(TEST_NAME1);
+  name.export(TEST_PATH1, testIface1);
+  obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
+  expect(obj.interfaces.length).toEqual(3);
+  name.unexport(TEST_PATH1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
   expect(obj.interfaces.length).toEqual(0);
 
   // unexport an interface and make sure it's gone
-  result = await bus.export(TEST_NAME1, TEST_PATH1, testIface1);
-  await bus.unexportInterface(TEST_NAME1, TEST_PATH1, testIface1);
+  name.export(TEST_PATH1, testIface1);
+  name.unexport(TEST_PATH1, testIface1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
   expect(obj.interfaces.length).toEqual(0);
 
-  await bus.unexportName(TEST_NAME1);
+  name.release();
 });
 
 test('export two interfaces on different names', async () => {
-  let [result1, result2, object ] = await Promise.all([
-    bus.export(TEST_NAME1, TEST_PATH1, testIface1),
-    bus.export(TEST_NAME2, TEST_PATH2, testIface2),
+  let [name1, name2, object ] = await Promise.all([
+    bus.requestName(TEST_NAME1),
+    bus.requestName(TEST_NAME2),
     bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus')
   ]);
+
+  name1.export(TEST_PATH1, testIface1);
+  name2.export(TEST_PATH2, testIface2);
+
   expect(Object.keys(bus._names).length).toEqual(2);
   let dbusIface = object.getInterface('org.freedesktop.DBus');
   let names = await dbusIface.ListNames();
   expect(names).toEqual(expect.arrayContaining([TEST_NAME1, TEST_NAME2]));
 
   await Promise.all([
-    bus.unexportName(TEST_NAME1),
-    bus.unexportName(TEST_NAME2)
+    name1.release(),
+    name2.release()
   ]);
   expect(Object.keys(bus._names).length).toEqual(0);
 });
 
 test('export two interfaces on the same name on different paths', async () => {
-  let [result1, result2, dbusObject ] = await Promise.all([
-    bus.export(TEST_NAME1, TEST_PATH1, testIface1),
-    bus.export(TEST_NAME1, TEST_PATH2, testIface2),
+  let [name, dbusObject ] = await Promise.all([
+    bus.requestName(TEST_NAME1),
     bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus')
   ]);
+
+  name.export(TEST_PATH1, testIface1);
+  name.export(TEST_PATH2, testIface2);
 
   expect(Object.keys(bus._names).length).toEqual(1);
   let dbusIface = dbusObject.getInterface('org.freedesktop.DBus');
@@ -130,16 +134,18 @@ test('export two interfaces on the same name on different paths', async () => {
   expect(obj1.getInterface(testIface1.$name)).toBeDefined();
   expect(obj2.getInterface(testIface2.$name)).toBeDefined();
 
-  bus.unexportName(TEST_NAME1);
+  name.release();
 });
 
-test('export a name taken by another bus and queue', async () => {
-  await bus.export(TEST_NAME1, TEST_PATH1, testIface1);
+test('request a name taken by another bus', async () => {
+  let name1 = await bus.requestName(TEST_NAME1);
+  name1.export(TEST_PATH1, testIface1);
 
-  let [result1, dbusObject ] = await Promise.all([
-    bus2.export(TEST_NAME1, TEST_PATH1, testIface2),
+  let [name2, dbusObject ] = await Promise.all([
+    bus2.requestName(TEST_NAME1),
     bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus')
   ]);
+  name2.export(TEST_PATH1, testIface2);
 
   expect(Object.keys(bus._names).length).toEqual(1);
   expect(Object.keys(bus2._names).length).toEqual(1);
@@ -153,9 +159,9 @@ test('export a name taken by another bus and queue', async () => {
   expect(names).toEqual(expect.arrayContaining([TEST_NAME1]));
   expect(obj.getInterface(TEST_IFACE1)).toBeDefined();
 
-  // bus2 should have the name in the queue so unexporting the name on bus1
+  // bus2 should have the name in the queue so releasing the name on bus1
   // should give it to bus2
-  await bus.unexportName(TEST_NAME1);
+  await name1.release();
 
   [ names, obj ] = await Promise.all([
     dbusIface.ListNames(),
@@ -165,9 +171,8 @@ test('export a name taken by another bus and queue', async () => {
   expect(obj.getInterface(TEST_IFACE2)).toBeDefined();
 
   // passing the flag to not queue should throw an error if the name is taken
-  let req = bus.export(TEST_NAME1, TEST_PATH1, testIface1,
-                       dbus.DBUS_NAME_FLAG_DO_NOT_QUEUE);
+  let req = bus.requestName(TEST_NAME1, dbus.DBUS_NAME_FLAG_DO_NOT_QUEUE);
   await expect(req).rejects.toBeInstanceOf(NameExistsError);
 
-  await bus2.unexportName(TEST_NAME1);
+  await name2.release();
 });
