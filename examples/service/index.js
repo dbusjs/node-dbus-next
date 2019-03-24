@@ -2,7 +2,7 @@ let dbus = require('../../../');
 let Variant = dbus.Variant;
 
 let {
-  Interface, property, method, signal, MethodError,
+  Interface, property, method, signal, DBusError,
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
@@ -45,7 +45,7 @@ class ExampleInterface extends Interface {
 
   @method({inSignature: '', outSignature: ''})
   ThrowsError() {
-    throw new MethodError('org.test.iface.Error', 'something went wrong');
+    throw new DBusError('org.test.iface.Error', 'something went wrong');
   }
 
   @signal({signature: 's'})
