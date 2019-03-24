@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.1
+
+This release contains breaking changes to how interfaces are exported on the bus with the public api. See the README and example service for the current way to export interfaces.
+
+* Add continuous integration
+* Give DBusError to clients when services throw errors (#11)
+* get dbus session bus address from the filesystem when `DBUS_SESSION_BUS_ADDRESS` is not set in the environment (addresses #14)
+* Add constants for name request flags
+* remove `bus.export()` and `bus.unexport()` (breaking)
+* Add `bus.requestName()` to the public api which now returns a promise which resolves to a `Name` object which is now also part of the public api.
+* Add `name.release()` to remove a name from the bus
+
 ## v0.3.2
 
 * Add bus name validators
