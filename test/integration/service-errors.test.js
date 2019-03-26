@@ -25,9 +25,17 @@ class ErroringInterface extends Interface {
     throw new Error('something went wrong');
   }
 
+  @property({signature: 's'})
+  WrongType = 55;
+
   @method({})
   ErrorMethod() {
     throw new Error('something went wrong');
+  }
+
+  @method({})
+  WrongReturn() {
+    return ['foo', 'bar'];
   }
 }
 
@@ -50,10 +58,16 @@ test('when services throw errors they should be returned to the client', async (
   let req = iface.ErrorMethod();
   await expect(req).rejects.toThrow(DBusError);
 
+  req = iface.WrongReturn();
+  await expect(req).rejects.toThrow(DBusError);
+
   req = properties.GetAll(TEST_IFACE);
   await expect(req).rejects.toThrow(DBusError);
 
   req = properties.Get(TEST_IFACE, 'ErrorProperty');
+  await expect(req).rejects.toThrow(DBusError);
+
+  req = properties.Get(TEST_IFACE, 'WrongType');
   await expect(req).rejects.toThrow(DBusError);
 
   req = properties.Set(TEST_IFACE, 'ErrorProperty', new Variant('s', 'something'));
