@@ -86,6 +86,17 @@ afterAll(() => {
   bus.connection.stream.end();
 });
 
+test('the peer interface', async () => {
+  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  let peer = object.getInterface('org.freedesktop.DBus.Peer');
+  expect(peer).toBeDefined();
+  expect(peer.Ping).toBeDefined();
+  let req = peer.Ping();
+  await expect(req).resolves.toBeNull();
+  req = peer.GetMachineId();
+  await expect(req).resolves.toBeDefined();
+});
+
 test('simple property get and set', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
 

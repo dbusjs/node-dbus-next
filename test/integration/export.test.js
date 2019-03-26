@@ -60,7 +60,8 @@ test('export and unexport interfaces and paths', async () => {
   let expectedIfaces = [
     testIface1.$name,
     'org.freedesktop.DBus.Properties',
-    'org.freedesktop.DBus.Introspectable'
+    'org.freedesktop.DBus.Introspectable',
+    'org.freedesktop.DBus.Peer',
   ];
   for (let expected of expectedIfaces) {
     expect(obj.interfaces.find((i) => i.$name === expected)).toBeDefined();
@@ -76,7 +77,7 @@ test('export and unexport interfaces and paths', async () => {
   name = await bus.requestName(TEST_NAME1);
   name.export(TEST_PATH1, testIface1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
-  expect(obj.interfaces.length).toEqual(3);
+  expect(obj.interfaces.length).toEqual(4);
   name.unexport(TEST_PATH1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
   expect(obj.interfaces.length).toEqual(0);
