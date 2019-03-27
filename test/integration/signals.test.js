@@ -10,10 +10,12 @@ let {
 } = dbus.interface;
 
 const TEST_NAME = 'org.test.name';
+const TEST_NAME2 = 'org.test.name2';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
 let bus = dbus.sessionBus();
+let bus2 = dbus.sessionBus();
 
 class SignalsInterface extends Interface {
   @signal({signature: 's'})
@@ -64,23 +66,29 @@ class SignalsInterface extends Interface {
 }
 
 let testIface = new SignalsInterface(TEST_IFACE);
+let testIface2 = new SignalsInterface(TEST_IFACE);
 
 beforeAll(async () => {
-  let name = await bus.requestName(TEST_NAME);
+  let [name, name2] = await Promise.all([
+    bus.requestName(TEST_NAME),
+    bus2.requestName(TEST_NAME2)
+  ]);
   name.export(TEST_PATH, testIface);
+  name2.export(TEST_PATH, testIface2);
 });
 
 afterAll(() => {
   bus.connection.stream.end();
+  bus2.connection.stream.end();
 });
 
 test('test that signals work correctly', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let test = object.getInterface(TEST_IFACE);
 
-  let onHelloWorld = jest.fn(() => {});
-  let onSignalMultiple = jest.fn(() => {});
-  let onSignalComplicated = jest.fn(() => {});
+  let onHelloWorld = jest.fn();
+  let onSignalMultiple = jest.fn();
+  let onSignalComplicated = jest.fn();
 
   test.on('HelloWorld', onHelloWorld);
   test.on('SignalMultiple', onSignalMultiple);
@@ -91,4 +99,35 @@ test('test that signals work correctly', async () => {
   expect(onHelloWorld).toHaveBeenCalledWith('hello');
   expect(onSignalMultiple).toHaveBeenCalledWith('hello', 'world');
   expect(onSignalComplicated).toHaveBeenCalledWith(testIface.complicated);
+});
+
+test('signals dont get mixed up between names that define objects on the same path and interface', async () => {
+  // Note that there is a really bad case where a single connection takes two
+  // names and exports the same interfaces and paths on them. Then there is no
+  // way to tell the signals apart from the names because the messages look
+  // identical to us. All we get is the unique name of the sender and not the
+  // well known name, and the well known name is what will be different. For
+  // this reason, I am going to recommend that people only use one name per bus
+  // connection until we can figure that out.
+  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  let object2 = await bus.getProxyObject(TEST_NAME2, TEST_PATH);
+
+  let test = object.getInterface(TEST_IFACE);
+  let test2 = object2.getInterface(TEST_IFACE);
+
+  let cb = jest.fn();
+  let cb2 = jest.fn();
+
+  test.on('HelloWorld', cb);
+  test.on('SignalMultiple', cb);
+  test.on('SignalComplicated', cb);
+
+  test2.on('HelloWorld', cb2);
+  test2.on('SignalMultiple', cb2);
+  test2.on('SignalComplicated', cb2);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(3);
+  expect(cb2).toHaveBeenCalledTimes(0);
 });
