@@ -1,28 +1,32 @@
-// dbus.freedesktop.org/doc/dbus-specification.html
-
 const EventEmitter = require('events').EventEmitter;
 const net = require('net');
 
 const constants = require('./lib/constants');
 const message = require('./lib/message');
 const clientHandshake = require('./lib/handshake');
-const serverHandshake = require('./lib/server-handshake');
 const MessageBus = require('./lib/bus');
-const server = require('./lib/server');
 const {getDbusAddressFromFs} = require('./lib/address-x11');
 const errors = require('./lib/errors');
+const variant = require('./lib/service/variant');
+const iface = require('./lib/service/interface');
 
 function createStream(opts) {
-  if (opts.stream) return opts.stream;
-  var host = opts.host;
-  var port = opts.port;
-  var socket = opts.socket;
-  if (socket) return net.createConnection(socket);
-  if (port) return net.createConnection(port, host);
+  if (opts.stream) {
+    return opts.stream;
+  }
+  let host = opts.host;
+  let port = opts.port;
+  let socket = opts.socket;
+  if (socket) {
+    return net.createConnection(socket);
+  }
+  if (port) {
+    return net.createConnection(port, host);
+  }
 
   // XXX according to the dbus spec, we should start a new server if the bus
   // address cannot be found.
-  var busAddress = opts.busAddress;
+  let busAddress = opts.busAddress;
   if (!busAddress) {
     busAddress = process.env.DBUS_SESSION_BUS_ADDRESS;
   }
@@ -30,14 +34,14 @@ function createStream(opts) {
     busAddress = getDbusAddressFromFs();
   }
 
-  var addresses = busAddress.split(';');
-  for (var i = 0; i < addresses.length; ++i) {
-    var address = addresses[i];
-    var familyParams = address.split(':');
-    var family = familyParams[0];
-    var params = {};
+  let addresses = busAddress.split(';');
+  for (let i = 0; i < addresses.length; ++i) {
+    let address = addresses[i];
+    let familyParams = address.split(':');
+    let family = familyParams[0];
+    let params = {};
     familyParams[1].split(',').map(function(p) {
-      var keyVal = p.split('=');
+      let keyVal = p.split('=');
       params[keyVal[0]] = keyVal[1];
     });
 
@@ -48,21 +52,25 @@ function createStream(opts) {
           port = params.port;
           return net.createConnection(port, host);
         case 'unix':
-          if (params.socket) return net.createConnection(params.socket);
+          if (params.socket) {
+            return net.createConnection(params.socket);
+          }
           if (params.abstract) {
-            var abs = require('abstract-socket');
+            let abs = require('abstract-socket');
             return abs.connect('\u0000' + params.abstract);
           }
-          if (params.path) return net.createConnection(params.path);
+          if (params.path) {
+            return net.createConnection(params.path);
+          }
           throw new Error(
             "not enough parameters for 'unix' connection - you need to specify 'socket' or 'abstract' or 'path' parameter"
           );
         case 'unixexec':
-          var eventStream = require('event-stream');
-          var spawn = require('child_process').spawn;
-          var args = [];
-          for (var n = 1; params['arg' + n]; n++) args.push(params['arg' + n]);
-          var child = spawn(params.path, args);
+          let eventStream = require('event-stream');
+          let spawn = require('child_process').spawn;
+          let args = [];
+          for (let n = 1; params['arg' + n]; n++) args.push(params['arg' + n]);
+          let child = spawn(params.path, args);
 
           return eventStream.duplex(child.stdin, child.stdout);
         default:
@@ -80,9 +88,9 @@ function createStream(opts) {
 }
 
 function createConnection(opts) {
-  var self = new EventEmitter();
-  if (!opts) opts = {};
-  var stream = (self.stream = createStream(opts));
+  let self = new EventEmitter();
+  opts = opts || {};
+  let stream = (self.stream = createStream(opts));
   stream.setNoDelay();
 
   stream.on('error', function(err) {
@@ -102,8 +110,7 @@ function createConnection(opts) {
     return self;
   };
 
-  var handshake = opts.server ? serverHandshake : clientHandshake;
-  handshake(stream, opts, function(error, guid) {
+  clientHandshake(stream, opts, function(error, guid) {
     if (error) {
       return self.emit('error', error);
     }
@@ -127,7 +134,7 @@ function createConnection(opts) {
 
   self.once('connect', function() {
     self.state = 'connected';
-    for (var i = 0; i < self._messages.length; ++i) {
+    for (let i = 0; i < self._messages.length; ++i) {
       stream.write(message.marshall(self._messages[i]));
     }
     self._messages.length = 0;
@@ -141,13 +148,13 @@ function createConnection(opts) {
   return self;
 }
 
-module.exports.createClient = function(params) {
-  var connection = createConnection(params || {});
+let createClient = function(params) {
+  let connection = createConnection(params || {});
   return new MessageBus(connection, params || {});
 };
 
 module.exports.systemBus = function() {
-  return module.exports.createClient({
+  return createClient({
     busAddress:
       process.env.DBUS_SYSTEM_BUS_ADDRESS ||
       'unix:path=/var/run/dbus/system_bus_socket'
@@ -155,23 +162,14 @@ module.exports.systemBus = function() {
 };
 
 module.exports.sessionBus = function(opts) {
-  return module.exports.createClient(opts);
+  return createClient(opts);
 };
-
-module.exports.messageType = constants.messageType;
 
 // name flags
 module.exports.DBUS_NAME_FLAG_ALLOW_REPLACEMENT = constants.DBUS_NAME_FLAG_ALLOW_REPLACEMENT;
 module.exports.DBUS_NAME_FLAG_REPLACE_EXISTING = constants.DBUS_NAME_FLAG_REPLACE_EXISTING;
 module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUEUE;
 
-module.exports.createConnection = createConnection;
-
-module.exports.createServer = server.createServer;
-
-// new stuff
-const variant = require('./lib/service/variant');
-const iface = require('./lib/service/interface');
 // use a polyfill for bigint
 module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompat
 module.exports.interface = iface;
