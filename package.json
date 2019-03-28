@@ -66,6 +66,10 @@
     "test": "dbus-run-session -- jest",
     "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "bail": true
+  },
   "engine": {
     "node": ">=6.3.0"
   }
