@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.2
+
+This release contains some important bugfixes and features.
+
+* Gracefully handle user errors in services by returning the error to the client. (#11)
+* Remove the old high-level interfaces. (#15)
+* Implement `org.freedesktop.DBus.Peer` for clients. (#16)
+* Cache name owners and discriminate signals on owner (fixes a lot of mpris-service test errors).
+* Clean up a lot of dead code.
+
 ## v0.4.1
 
 This release contains breaking changes to how interfaces are exported on the bus with the public api. See the README and example service for the current way to export interfaces.
