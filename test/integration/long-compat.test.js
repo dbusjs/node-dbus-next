@@ -53,7 +53,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 test('test long type works correctly in compatibility mode', async () => {

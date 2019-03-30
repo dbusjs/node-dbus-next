@@ -78,8 +78,8 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
-  bus2.connection.stream.end();
+  bus.disconnect();
+  bus2.disconnect();
 });
 
 test('test that signals work correctly', async () => {

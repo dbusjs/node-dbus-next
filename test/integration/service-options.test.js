@@ -55,7 +55,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 test('renamed and disabled property requests', async () => {

@@ -47,7 +47,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 test('when services throw errors they should be returned to the client', async () => {

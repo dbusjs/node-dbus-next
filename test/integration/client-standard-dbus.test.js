@@ -5,7 +5,7 @@ let dbus = require('../../');
 let bus = dbus.sessionBus();
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 test('lists names on the bus', async () => {

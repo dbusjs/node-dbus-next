@@ -64,7 +64,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 // a really complicated variant

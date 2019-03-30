@@ -83,7 +83,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  bus.connection.stream.end();
+  bus.disconnect();
 });
 
 test('the peer interface', async () => {

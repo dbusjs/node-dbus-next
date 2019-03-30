@@ -16,8 +16,8 @@ let bus = dbus.sessionBus();
 let bus2 = dbus.sessionBus();
 
 afterAll(() => {
-  bus.connection.stream.end();
-  bus2.connection.stream.end();
+  bus.disconnect();
+  bus2.disconnect();
 });
 
 const TEST_NAME1 = 'org.test.export_name1';
