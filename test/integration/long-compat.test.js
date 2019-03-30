@@ -20,7 +20,7 @@ const MIN_INT64 = JSBI.BigInt(MIN_INT64_STR);
 const MAX_UINT64 = JSBI.BigInt(MAX_UINT64_STR);
 const MIN_UINT64 = JSBI.BigInt(MIN_UINT64_STR);
 
-const TEST_NAME = 'org.test.name';
+const TEST_NAME = 'org.test.long_compat';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 const TEST_ERROR_PATH = 'org.test.name.error';

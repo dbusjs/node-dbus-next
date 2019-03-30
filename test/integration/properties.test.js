@@ -9,7 +9,7 @@ let {
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
-const TEST_NAME = 'org.test.name';
+const TEST_NAME = 'org.test.properties';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 const USER_ERROR_IFACE = 'org.test.usererror';

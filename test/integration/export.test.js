@@ -8,7 +8,7 @@ const {
 
 const NameExistsError = dbus.NameExistsError;
 
-const TEST_NAME = 'org.test.name';
+const TEST_NAME = 'org.test.export';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
@@ -20,11 +20,11 @@ afterAll(() => {
   bus2.connection.stream.end();
 });
 
-const TEST_NAME1 = 'org.test.name1';
+const TEST_NAME1 = 'org.test.export_name1';
 const TEST_PATH1 = '/org/test/path1';
 const TEST_IFACE1 = 'org.test.iface1';
 
-const TEST_NAME2 = 'org.test.name2';
+const TEST_NAME2 = 'org.test.export_name2';
 const TEST_PATH2 = '/org/test/path2';
 const TEST_IFACE2 = 'org.test.iface2';
 

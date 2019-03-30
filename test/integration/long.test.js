@@ -23,7 +23,7 @@ const MIN_INT64 = BigInt(MIN_INT64_STR);
 const MAX_UINT64 = BigInt(MAX_UINT64_STR);
 const MIN_UINT64 = BigInt(MIN_UINT64_STR);
 
-const TEST_NAME = 'org.test.name';
+const TEST_NAME = 'org.test.long';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
