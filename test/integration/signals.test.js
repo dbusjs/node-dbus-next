@@ -15,7 +15,13 @@ const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
 let bus = dbus.sessionBus();
+bus.on('error', (err) => {
+  console.log(`got unexpected connection error:\n${err.stack}`);
+});
 let bus2 = dbus.sessionBus();
+bus2.on('error', (err) => {
+  console.log(`got unexpected connection error:\n${err.stack}`);
+});
 
 class SignalsInterface extends Interface {
   @signal({signature: 's'})

@@ -26,6 +26,9 @@ const TEST_IFACE = 'org.test.iface';
 const TEST_ERROR_PATH = 'org.test.name.error';
 
 let bus = dbus.sessionBus();
+bus.on('error', (err) => {
+  console.log(`got unexpected connection error:\n${err.stack}`);
+});
 
 class LongInterface extends Interface {
   @method({inSignature: 'x', outSignature: 'x'})

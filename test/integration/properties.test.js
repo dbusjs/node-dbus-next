@@ -16,6 +16,9 @@ const USER_ERROR_IFACE = 'org.test.usererror';
 const INVALID_ARGS = 'org.freedesktop.DBus.Error.InvalidArgs'
 
 let bus = dbus.sessionBus();
+bus.on('error', (err) => {
+  console.log(`got unexpected connection error:\n${err.stack}`);
+});
 
 class UserErrorInterface extends Interface {
   constructor(name) {

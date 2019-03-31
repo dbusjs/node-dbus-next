@@ -3,6 +3,9 @@
 
 let dbus = require('../../');
 let bus = dbus.sessionBus();
+bus.on('error', (err) => {
+  console.log(`got unexpected connection error:\n${err.stack}`);
+});
 
 afterAll(() => {
   bus.disconnect();
