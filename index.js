@@ -11,22 +11,10 @@ const variant = require('./lib/service/variant');
 const iface = require('./lib/service/interface');
 
 function createStream(opts) {
-  if (opts.stream) {
-    return opts.stream;
-  }
-  let host = opts.host;
-  let port = opts.port;
-  let socket = opts.socket;
-  if (socket) {
-    return net.createConnection(socket);
-  }
-  if (port) {
-    return net.createConnection(port, host);
-  }
+  let { busAddress } = opts;
 
   // XXX according to the dbus spec, we should start a new server if the bus
   // address cannot be found.
-  let busAddress = opts.busAddress;
   if (!busAddress) {
     busAddress = process.env.DBUS_SESSION_BUS_ADDRESS;
   }
@@ -48,9 +36,7 @@ function createStream(opts) {
     try {
       switch (family.toLowerCase()) {
         case 'tcp':
-          host = params.host || 'localhost';
-          port = params.port;
-          return net.createConnection(port, host);
+          throw new Error('tcp dbus connections are not supported');
         case 'unix':
           if (params.socket) {
             return net.createConnection(params.socket);
@@ -150,7 +136,7 @@ function createConnection(opts) {
 
 let createClient = function(params) {
   let connection = createConnection(params || {});
-  return new MessageBus(connection, params || {});
+  return new MessageBus(connection);
 };
 
 module.exports.systemBus = function() {
