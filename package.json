@@ -64,7 +64,7 @@
     "coverage": "dbus-run-session -- jest --coverage",
     "unit": "jest ./test/*.test.js",
     "test": "dbus-run-session -- jest",
-    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib"
+    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib index.js"
   },
   "jest": {
     "testEnvironment": "node",
