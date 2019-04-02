@@ -57,14 +57,14 @@
     "commander": "^2.19.0",
     "handlebars": "^4.1.0",
     "jest": "^24.1.0",
-    "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git"
+    "jsdoc": "^3.5.5"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",
     "coverage": "dbus-run-session -- jest --coverage",
     "unit": "jest ./test/*.test.js",
     "test": "dbus-run-session -- jest",
-    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md --package package.json -r lib index.js"
+    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md -r lib index.js -d doc"
   },
   "jest": {
     "testEnvironment": "node",
