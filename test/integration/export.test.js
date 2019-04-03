@@ -70,7 +70,7 @@ test('export and unexport interfaces and paths', async () => {
     'org.freedesktop.DBus.Peer',
   ];
   for (let expected of expectedIfaces) {
-    expect(obj.interfaces.find((i) => i.$name === expected)).toBeDefined();
+    expect(obj.interfaces[expected]).toBeDefined();
   }
 
   // release the name and make sure it leaves the bus
@@ -83,16 +83,16 @@ test('export and unexport interfaces and paths', async () => {
   name = await bus.requestName(TEST_NAME1);
   name.export(TEST_PATH1, testIface1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
-  expect(obj.interfaces.length).toEqual(4);
+  expect(Object.keys(obj.interfaces).length).toEqual(4);
   name.unexport(TEST_PATH1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
-  expect(obj.interfaces.length).toEqual(0);
+  expect(Object.keys(obj.interfaces).length).toEqual(0);
 
   // unexport an interface and make sure it's gone
   name.export(TEST_PATH1, testIface1);
   name.unexport(TEST_PATH1, testIface1);
   obj = await bus.getProxyObject(TEST_NAME1, TEST_PATH1);
-  expect(obj.interfaces.length).toEqual(0);
+  expect(Object.keys(obj.interfaces).length).toEqual(0);
 
   name.release();
 });
