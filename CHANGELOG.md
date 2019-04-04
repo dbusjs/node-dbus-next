@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.5.1
+
+This release contains some import bugfixes, features, and breaking changes. The
+service interface has been upgraded to "somewhat stable".
+
+* Use an ES2015 class for the `MessageBus`.
+* Make the low level interface private for now. (breaking, ref #20).
+* Document the public api and make everything not documented private (breaking, #10).
+* Remove tcp message bus support (breaking).
+* Forward connection errors to the `MessageBus`.
+* Make `interfaces` member of the `ProxyObject` a map from interface names to `ProxyInterface`s (breaking).
+* `ProxyObject#getInterface` now throws an error if the interface is not found (breaking).
+
 ## v0.4.2
 
 This release contains some important bugfixes and features.
