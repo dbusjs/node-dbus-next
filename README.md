@@ -2,7 +2,7 @@
 
 The next great DBus library for NodeJS.
 
-[Documentation](https://acrisci.github.io/node-dbus-next/).
+[Documentation](https://acrisci.github.io/doc/node-dbus-next/).
 
 *This project is under development and may make breaking changes in minor versions until 1.0.*
 
@@ -71,7 +71,7 @@ For a complete example, see the [MPRIS client](https://github.com/acrisci/node-d
 
 ## The Service Interface
 
-*The Service interface is somewhat unstable*
+*The Service interface is somewhat stable*
 
 You can use the `Interface` class to define your interfaces. This interfaces uses the proposed [decorators syntax](https://github.com/tc39/proposal-decorators) which is not yet part of the ECMAScript standard, but should be included one day. Unfortunately, you'll need a [Babel plugin](https://www.npmjs.com/package/@babel/plugin-proposal-decorators) to make this code work for now.
 
@@ -175,7 +175,7 @@ Contributions are welcome. Development happens on [Github](https://github.com/ac
 
 ## Similar Projects
 
-dbus-next is a fork of [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is great, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but this project requires compiling C code and similarly does not provide enough features to create full-featured DBus services.
+dbus-next is a fork of [dbus-native](https://github.com/sidorares/dbus-native) library. While this library is great, it has many bugs which I don't think can be fixed without completely redesigning the user API. Another library exists [node-dbus](https://github.com/Shouqun/node-dbus) which is similar, but also not provide enough features to create full-featured DBus services.
 
 ## Copyright
 
