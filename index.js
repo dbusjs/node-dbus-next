@@ -1,7 +1,7 @@
 const constants = require('./lib/constants');
 const MessageBus = require('./lib/bus');
 const errors = require('./lib/errors');
-const variant = require('./lib/service/variant');
+const {Variant} = require('./lib//variant');
 const iface = require('./lib/service/interface');
 const createConnection = require('./lib/connection.js');
 
@@ -79,7 +79,7 @@ module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUE
  */
 module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompat
 module.exports.interface = iface;
-module.exports.Variant = variant.Variant;
+module.exports.Variant = Variant;
 module.exports.validators = require('./lib/validators');
 module.exports.DBusError = errors.DBusError;
 module.exports.NameExistsError = errors.NameExistsError;
