@@ -1,6 +1,11 @@
 let dbus = require('../../');
 let {Message} = require('../../lib/message-type');
-let {METHOD_CALL, METHOD_RETURN, SIGNAL} = require('../../lib/constants').messageType;
+let {
+  METHOD_CALL,
+  METHOD_RETURN,
+  SIGNAL,
+  ERROR
+} = require('../../lib/constants').messageType;
 
 let bus1 = dbus.sessionBus();
 let bus2 = dbus.sessionBus();
@@ -85,6 +90,14 @@ test('send a method call between buses', async () => {
   }
 
   expect(error).not.toBeNull();
+  expect(error.reply).toBeInstanceOf(Message);
+  expect(error.reply.type).toEqual(ERROR);
+  expect(error.reply.sender).toEqual(bus1.name);
+  expect(error.reply.errorName).toEqual('org.test.Error');
+  expect(error.reply.signature).toEqual('s');
+  expect(error.reply.replySerial).toEqual(msg.serial);
+  expect(error.reply.body).toEqual(['throwing an error']);
+
   expect(error.type).toEqual('org.test.Error');
   expect(error.message).toEqual('throwing an error');
 });
