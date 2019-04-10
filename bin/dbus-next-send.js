@@ -4,7 +4,7 @@
 
 const program = require('commander');
 const dbus = require('../');
-const {Message} = require('../lib/message-type');
+const Message = dbus.Message;
 const {
   METHOD_RETURN,
   ERROR,

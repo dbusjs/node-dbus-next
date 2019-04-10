@@ -1,5 +1,5 @@
 let dbus = require('../../');
-let {Message} = require('../../lib/message-type');
+let Message = dbus.Message;
 let {
   METHOD_CALL,
   METHOD_RETURN,
