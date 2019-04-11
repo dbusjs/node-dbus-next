@@ -56,7 +56,7 @@ test('send a method call between buses', async () => {
   bus1._addMethodHandler(methodReturnHandler);
   expect(bus1._methodHandlers.length).toEqual(1);
 
-  const reply = await bus2._call(msg);
+  let reply = await bus2._call(msg);
 
   expect(bus1._methodHandlers.length).toEqual(0);
   expect(reply.type).toEqual(MESSAGE_TYPE_METHOD_RETURN);
@@ -100,6 +100,21 @@ test('send a method call between buses', async () => {
 
   expect(error.type).toEqual('org.test.Error');
   expect(error.message).toEqual('throwing an error');
+
+  // with no reply expected
+  let waitForMessage = new Promise((resolve) => {
+    bus1.once('message', (msg) => {
+      if (msg.sender === bus2.name) {
+        resolve(msg);
+      }
+    });
+  });
+
+  msg.flags = dbus.MESSAGE_FLAG_NO_REPLY_EXPECTED;
+  let result = await bus2._call(msg);
+  expect(result).toBeNull();
+  reply = await waitForMessage;
+  expect(reply).toBeInstanceOf(Message);
 });
 
 test('send a signal between buses', async () => {
@@ -114,7 +129,7 @@ test('send a signal between buses', async () => {
   await bus1._call(addMatchMessage)
 
   let waitForMessage = new Promise((resolve) => {
-    bus1.on('message', (msg) => {
+    bus1.once('message', (msg) => {
       if (msg.sender === bus2.name) {
         resolve(msg);
       }
