@@ -70,6 +70,60 @@ module.exports.DBUS_NAME_FLAG_REPLACE_EXISTING = constants.DBUS_NAME_FLAG_REPLAC
 module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUEUE;
 
 /**
+ * An enum value for the {@link Message} `type` member to indicate the message
+ * is a method call.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_TYPE_METHOD_CALL
+ */
+module.exports.MESSAGE_TYPE_METHOD_CALL = constants.messageType.METHOD_CALL;
+
+/**
+ * An enum value for the {@link Message} `type` member to indicate the message
+ * is a method return.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_TYPE_METHOD_RETURN
+ */
+module.exports.MESSAGE_TYPE_METHOD_RETURN = constants.messageType.METHOD_RETURN;
+
+/**
+ * An enum value for the {@link Message} `type` member to indicate the message
+ * is a signal.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_TYPE_SIGNAL
+ */
+module.exports.MESSAGE_TYPE_SIGNAL = constants.messageType.SIGNAL;
+
+/**
+ * An enum value for the {@link Message} `type` member to indicate the message
+ * is an error reply.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_TYPE_ERROR
+ */
+module.exports.MESSAGE_TYPE_ERROR = constants.messageType.ERROR;
+
+/**
+ * A flag for the {@link Message} `flags` member to indicate no reply is
+ * expected from this message.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_FLAG_NO_REPLY_EXPECTED
+ */
+module.exports.MESSAGE_FLAG_NO_REPLY_EXPECTED = constants.flags.noReplyExpected;
+
+/**
+ * A flag for the {@link Message} `flags` member to indicate this message
+ * should not autostart a service.
+ *
+ * @see https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol
+ * @constant MESSAGE_FLAG_NO_AUTO_START
+ */
+module.exports.MESSAGE_FLAG_NO_AUTO_START = constants.flags.noAutoStart;
+
+/**
  * Use JSBI as a polyfill for long integer types ('x' and 't') in the client
  * and the service. This is required for Node verisons that do not support the
  * native `BigInt` class which is used by default for these types (version <
@@ -79,6 +133,7 @@ module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUE
  * @param {boolean} compat - pass `true` to use JSBI.
  */
 module.exports.setBigIntCompat = require('./lib/library-options').setBigIntCompat
+
 module.exports.interface = iface;
 module.exports.Variant = Variant;
 module.exports.Message = Message;
