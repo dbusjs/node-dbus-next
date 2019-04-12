@@ -169,6 +169,47 @@ To emit a signal, just call the method marked with the `signal` decorator and th
 
 If you have an interface xml description, which can be gotten from the `org.freedesktop.DBus.Introspect` method on an exported interface, you can generate dbus-next JavaScript classes from the xml file with the `bin/generate-interfaces.js` utility.
 
+## The Low-Level Interface
+
+The low-level interface can be used to interact with messages directly. Create new messages with the `Message` class to be sent on the bus as method calls, signals, method returns, or errors. Method calls can be called with the `call()` method of the `MessageBus` to await a reply and `send()` can be use for messages that don't expect a reply.
+
+```js
+let dbus = require('dbus-next');
+let Message = dbus.Message;
+
+let bus = dbus.sessionBus();
+
+// send a method call to list the names on the bus
+let methodCall = new Message({
+  destination: 'org.freedesktop.DBus',
+  path: '/org/freedesktop/DBus',
+  interface: 'org.freedesktop.DBus',
+  member: 'ListNames'
+});
+
+let reply = await bus.call(message);
+console.log('names on the bus: ', reply.body[0]);
+
+// add a custom handler for a particular method
+bus.addMethodHandler((msg) => {
+  if (msg.path === '/org/test/path' &&
+      msg.interface === 'org.test.interface'
+      && msg.member === 'SomeMethod') {
+    // handle the method by sending a reply
+    let someMethodReply = Message.newMethodReturn(msg, 's', ['hello']);
+    bus.send(someMethodReply);
+    return true;
+  }
+});
+
+// listen to any messages that are sent to the bus
+bus.on('message', (msg) => {
+  console.log('got a message: ', msg);
+});
+```
+
+For a complete example of how to use the low-level interface to send messages, see the `dbus-next-send.js` script in the `bin` directory.
+
 ## Contributing
 
 Contributions are welcome. Development happens on [Github](https://github.com/acrisci/node-dbus-next).

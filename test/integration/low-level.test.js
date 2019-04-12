@@ -47,16 +47,16 @@ test('send a method call between buses', async () => {
       expect(sent.interface).toEqual(msg.interface);
       expect(sent.member).toEqual(msg.member);
 
-      bus1._send(Message.newMethodReturn(sent, 's', ['got it']));
-      bus1._removeMethodHandler(methodReturnHandler);
+      bus1.send(Message.newMethodReturn(sent, 's', ['got it']));
+      bus1.removeMethodHandler(methodReturnHandler);
       return true;
     }
     return false;
   }
-  bus1._addMethodHandler(methodReturnHandler);
+  bus1.addMethodHandler(methodReturnHandler);
   expect(bus1._methodHandlers.length).toEqual(1);
 
-  let reply = await bus2._call(msg);
+  let reply = await bus2.call(msg);
 
   expect(bus1._methodHandlers.length).toEqual(0);
   expect(reply.type).toEqual(MESSAGE_TYPE_METHOD_RETURN);
@@ -73,18 +73,18 @@ test('send a method call between buses', async () => {
       expect(sent.interface).toEqual(msg.interface);
       expect(sent.member).toEqual(msg.member);
 
-      bus1._send(Message.newError(sent, 'org.test.Error', 'throwing an error'));
-      bus1._removeMethodHandler(errorReturnHandler);
+      bus1.send(Message.newError(sent, 'org.test.Error', 'throwing an error'));
+      bus1.removeMethodHandler(errorReturnHandler);
       return true;
     }
     return false;
   }
 
-  bus1._addMethodHandler(errorReturnHandler);
+  bus1.addMethodHandler(errorReturnHandler);
   let error = null;
   try {
     // sending the same message twice should reset the serial
-    await bus2._call(msg);
+    await bus2.call(msg);
   } catch(e) {
     error = e;
   }
@@ -111,7 +111,7 @@ test('send a method call between buses', async () => {
   });
 
   msg.flags = dbus.MESSAGE_FLAG_NO_REPLY_EXPECTED;
-  let result = await bus2._call(msg);
+  let result = await bus2.call(msg);
   expect(result).toBeNull();
   reply = await waitForMessage;
   expect(reply).toBeInstanceOf(Message);
@@ -126,7 +126,7 @@ test('send a signal between buses', async () => {
     signature: 's',
     body: [`sender='${bus2.name}'`]
   });
-  await bus1._call(addMatchMessage)
+  await bus1.call(addMatchMessage)
 
   let waitForMessage = new Promise((resolve) => {
     bus1.once('message', (msg) => {
@@ -136,7 +136,7 @@ test('send a signal between buses', async () => {
     });
   });
 
-  bus2._send(Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']));
+  bus2.send(Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']));
   let signal = await waitForMessage;
 
   expect(signal.type).toEqual(MESSAGE_TYPE_SIGNAL);

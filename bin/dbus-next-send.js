@@ -128,7 +128,7 @@ let message = new Message({
 });
 
 if (type === MESSAGE_TYPE_METHOD_CALL) {
-  bus._call(message)
+  bus.call(message)
     .then((reply) => {
       console.log(JSON.stringify(reply, null, 2));
       process.exit(0);
@@ -138,6 +138,6 @@ if (type === MESSAGE_TYPE_METHOD_CALL) {
       process.exit(1);
     });
 } else {
-  bus._send(message);
+  bus.send(message);
   process.exit(0);
 }
