@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.6.1
+
+This release contains new major features.
+
+* Redesign, expose, and add tests for the low-level api (#20)
+* Add reply info to DBusError for the client (#21)
+* Add the dbus-next-send.js script to demonstrate the low-level api.
+
+For more information on the low-level api, see the documentation for the new
+classes and members.
+
+* `Message` class - Represents a DBus message for sending or receiving messages on the bus.
+* `MessageBus#call()` - Send a method call message on the bus and wait for a reply.
+* `MessageBus#send()` - Send a message on the bus.
+* `MessageBus#newSerial()` - Get a serial for sending the message.
+* `MessageBus#addMethodHandler()` - Add a custom method handler for messages.
+* `MessageBus#removeMethodHandler()` - Remove a method handler.
+
+The `MessageBus` has gained the following events:
+
+* `connect` - Emitted after the bus has connected.
+* `message` - Emitted when a message is received on the bus.
+
 ## v0.5.1
 
 This release contains some import bugfixes, features, and breaking changes. The
