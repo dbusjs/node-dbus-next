@@ -12,6 +12,12 @@ let createClient = function(params) {
 };
 
 /**
+ * Create a new {@link MessageBus} client on a manually defined bus to connect to
+ * interfaces or request service names. Connects to the socket specified by the
+ * properties assigned.
+ */
+module.exports.createClient = createClient;
+/**
  * Create a new {@link MessageBus} client on the DBus system bus to connect to
  * interfaces or request service names. Connects to the socket specified by the
  * `DBUS_SYSTEM_BUS_ADDRESS` environment variable or
