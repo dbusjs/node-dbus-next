@@ -8,7 +8,7 @@ const PROPERTIES_IFACE = 'org.freedesktop.DBus.Properties';
 
 async function listAll() {
   let result = [];
-  let bus = dbus.sessionBus();
+  let bus = dbus.connect({ bus: "session" });
   let obj = await bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus');
   let iface = obj.getInterface('org.freedesktop.DBus');
   let names = await iface.ListNames();
@@ -107,7 +107,7 @@ async function main() {
     playerName = `org.mpris.MediaPlayer2.${program.player}`;
   }
 
-  let bus = dbus.sessionBus();
+  let bus = dbus.connect({ bus: "session" });
   let obj = await bus.getProxyObject(playerName, MPRIS_PATH);
   let player = obj.getInterface(MPRIS_IFACE);
   let props = obj.getInterface(PROPERTIES_IFACE);

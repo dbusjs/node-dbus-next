@@ -115,7 +115,9 @@ if (!Array.isArray(body)) {
   exitError('body must be an array of arguments');
 }
 
-let bus = (program.system ? dbus.systemBus() : dbus.sessionBus());
+let bus = dbus.connect({
+  bus: program.system ? "system" : "session"
+});
 
 let message = new Message({
   type: type,

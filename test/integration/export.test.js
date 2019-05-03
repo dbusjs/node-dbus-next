@@ -12,11 +12,11 @@ const TEST_NAME = 'org.test.export';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
-let bus2 = dbus.sessionBus();
+let bus2 = dbus.connect({ bus: "session" });
 bus2.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });

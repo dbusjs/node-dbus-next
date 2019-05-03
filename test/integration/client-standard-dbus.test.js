@@ -2,7 +2,7 @@
 // correctly
 
 let dbus = require('../../');
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });

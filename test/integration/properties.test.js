@@ -15,7 +15,7 @@ const TEST_IFACE = 'org.test.iface';
 const USER_ERROR_IFACE = 'org.test.usererror';
 const INVALID_ARGS = 'org.freedesktop.DBus.Error.InvalidArgs'
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });

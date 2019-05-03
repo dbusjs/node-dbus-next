@@ -6,7 +6,7 @@ let {
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 
 class ExampleInterface extends Interface {
   @property({signature: 's', access: ACCESS_READWRITE})

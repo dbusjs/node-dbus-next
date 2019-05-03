@@ -7,8 +7,8 @@ let {
   MESSAGE_TYPE_ERROR
 } = dbus;
 
-let bus1 = dbus.sessionBus();
-let bus2 = dbus.sessionBus();
+let bus1 = dbus.connect({ bus: "session" });
+let bus2 = dbus.connect({ bus: "session" });
 
 bus1.on('error', (err) => {
   console.log(`bus1 got unexpected connection error:\n${err.stack}`);

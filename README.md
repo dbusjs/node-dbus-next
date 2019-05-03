@@ -39,7 +39,7 @@ This is a brief example of using a proxy object with the [MPRIS](https://specifi
 
 ```js
 let dbus = require('dbus-next');
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 let Variant = dbus.Variant;
 
 // getting an object introspects it on the bus and creates the interfaces
@@ -84,7 +84,7 @@ let {
   ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
 } = dbus.interface;
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 
 class ExampleInterface extends Interface {
   @property({signature: 's', access: ACCESS_READWRITE})
@@ -177,7 +177,7 @@ The low-level interface can be used to interact with messages directly. Create n
 let dbus = require('dbus-next');
 let Message = dbus.Message;
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 
 // send a method call to list the names on the bus
 let methodCall = new Message({

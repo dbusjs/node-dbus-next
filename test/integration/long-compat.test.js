@@ -25,7 +25,7 @@ const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 const TEST_ERROR_PATH = 'org.test.name.error';
 
-let bus = dbus.sessionBus();
+let bus = dbus.connect({ bus: "session" });
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
