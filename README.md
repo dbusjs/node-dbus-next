@@ -151,9 +151,9 @@ setTimeout(() => {
 
 async function main() {
   // make a request for the name on the bus
-  let name = await bus.requestName('org.test.name');
-  // export the interface on the name
-  name.export('/org/test/path', example);
+  await bus.requestName('org.test.name');
+  // export the interface on the path
+  bus.export('/org/test/path', example);
 }
 
 main().catch((err) => {
@@ -161,7 +161,7 @@ main().catch((err) => {
 });
 ```
 
-Interfaces extend the `Interface` class. Declare service methods, properties, and signals with the decorators provided from the library. First request a name on the bus with `bus.requestName()`. Then call `name.export()` with the path and interface to expose this interface on the bus.
+Interfaces extend the `Interface` class. Declare service methods, properties, and signals with the decorators provided from the library. You can optionally request a name on the bus with `bus.requestName()` so clients have a well-known name to connect to. Then call `bus.export()` with the path and interface to expose this interface on the bus.
 
 Methods are called when a DBus client calls that method on the server. Properties can be gotten and set with the `org.freedesktop.DBus.Properties` interface and are included in the introspection xml.
 

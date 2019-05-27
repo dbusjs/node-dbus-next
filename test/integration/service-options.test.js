@@ -53,8 +53,8 @@ class OptionsTestInterface extends Interface {
 let testIface = new OptionsTestInterface(TEST_IFACE);
 
 beforeAll(async () => {
-  let name = await bus.requestName(TEST_NAME);
-  name.export(TEST_PATH, testIface);
+  await bus.requestName(TEST_NAME);
+  bus.export(TEST_PATH, testIface);
 });
 
 afterAll(() => {

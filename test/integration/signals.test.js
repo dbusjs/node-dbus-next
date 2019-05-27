@@ -75,12 +75,12 @@ let testIface = new SignalsInterface(TEST_IFACE);
 let testIface2 = new SignalsInterface(TEST_IFACE);
 
 beforeAll(async () => {
-  let [name, name2] = await Promise.all([
+  await Promise.all([
     bus.requestName(TEST_NAME),
     bus2.requestName(TEST_NAME2)
   ]);
-  name.export(TEST_PATH, testIface);
-  name2.export(TEST_PATH, testIface2);
+  bus.export(TEST_PATH, testIface);
+  bus2.export(TEST_PATH, testIface2);
 });
 
 afterAll(() => {

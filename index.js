@@ -61,13 +61,87 @@ module.exports.DBUS_NAME_FLAG_REPLACE_EXISTING = constants.DBUS_NAME_FLAG_REPLAC
 
 /**
  * A flag for {@link MessageBus#requestName} to indicate this request should
- * not enter the queue of clients requesting this name if it is taken. The
- * request may fail with {@link NameExistsError} in this case.
+ * not enter the queue of clients requesting this name if it is taken.
  *
  * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-request-name}
  * @constant DBUS_NAME_FLAG_DO_NOT_QUEUE
  */
 module.exports.DBUS_NAME_FLAG_DO_NOT_QUEUE = constants.DBUS_NAME_FLAG_DO_NOT_QUEUE;
+
+/**
+ * An enum for the return value of {@link MessageBus#requestName} to indicate
+ * the caller is now the primary owner of the name, replacing any previous
+ * owner.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-request-name}
+ * @constant DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER
+ */
+module.exports.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = constants.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER;
+
+/**
+ * An enum for the return value of {@link MessageBus#requestName} to indicate
+ * the name already had an owner, `DBUS_NAME_FLAG_DO_NOT_QUEUE` was not
+ * specified, and either the current owner did not specify
+ * `DBUS_NAME_FLAG_ALLOW_REPLACEMENT` or the requesting application did not
+ * specify `DBUS_NAME_FLAG_REPLACE_EXISTING`.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-request-name}
+ * @constant DBUS_REQUEST_NAME_REPLY_IN_QUEUE
+ */
+module.exports.DBUS_REQUEST_NAME_REPLY_IN_QUEUE = constants.DBUS_REQUEST_NAME_REPLY_IN_QUEUE;
+
+/**
+ * An enum for the return value of {@link MessageBus#requestName} to indicate
+ * the name already has an owner, `DBUS_NAME_FLAG_DO_NOT_QUEUE` was specified,
+ * and either `DBUS_NAME_FLAG_ALLOW_REPLACEMENT` was not specified by the
+ * current owner, or `DBUS_NAME_FLAG_REPLACE_EXISTING` was not specified by the
+ * requesting application.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-request-name}
+ * @constant DBUS_REQUEST_NAME_REPLY_EXISTS
+ */
+module.exports.DBUS_REQUEST_NAME_REPLY_EXISTS = constants.DBUS_REQUEST_NAME_REPLY_EXISTS;
+
+/**
+ * An enum for the return value of {@link MessageBus#requestName} to indicate
+ * the application trying to request ownership of a name is already the owner
+ * of it.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-request-name}
+ * @constant DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER
+ */
+module.exports.DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER = constants.DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER;
+
+/**
+ * An enumn for the return value of {@link MessageBus#releaseName} to indicate
+ * the caller has released his claim on the given name. Either the caller was
+ * the primary owner of the name, and the name is now unused or taken by
+ * somebody waiting in the queue for the name, or the caller was waiting in the
+ * queue for the name and has now been removed from the queue.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-release-name}
+ * @constant DBUS_RELEASE_NAME_REPLY_RELEASED
+ */
+module.exports.DBUS_RELEASE_NAME_REPLY_RELEASED = constants.DBUS_RELEASE_NAME_REPLY_RELEASED;
+
+/**
+ * An enumn for the return value of {@link MessageBus#releaseName} to indicate
+ * the given name does not exist on this bus.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-release-name}
+ * @constant DBUS_RELEASE_NAME_REPLY_NON_EXISTENT
+ */
+module.exports.DBUS_RELEASE_NAME_REPLY_NON_EXISTENT = constants.DBUS_RELEASE_NAME_REPLY_NON_EXISTENT;
+
+/**
+ * An enumn for the return value of {@link MessageBus#releaseName} to indicate
+ * the caller was not the primary owner of this name, and was also not waiting
+ * in the queue to own this name.
+ *
+ * @see {@link https://dbus.freedesktop.org/doc/dbus-specification.html#bus-messages-release-name}
+ * @constant DBUS_RELEASE_NAME_REPLY_NOT_OWNER
+ */
+module.exports.DBUS_RELEASE_NAME_REPLY_NOT_OWNER = constants.DBUS_RELEASE_NAME_REPLY_NOT_OWNER;
 
 /**
  * An enum value for the {@link Message} `type` member to indicate the message
@@ -139,4 +213,3 @@ module.exports.Variant = Variant;
 module.exports.Message = Message;
 module.exports.validators = require('./lib/validators');
 module.exports.DBusError = errors.DBusError;
-module.exports.NameExistsError = errors.NameExistsError;

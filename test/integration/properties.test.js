@@ -80,9 +80,9 @@ let testIface = new TestInterface(TEST_IFACE);
 let userErrorIface = new UserErrorInterface(USER_ERROR_IFACE);
 
 beforeAll(async () => {
-  let name = await bus.requestName(TEST_NAME);
-  name.export(TEST_PATH, testIface);
-  name.export(TEST_PATH, userErrorIface);
+  await bus.requestName(TEST_NAME);
+  bus.export(TEST_PATH, testIface);
+  bus.export(TEST_PATH, userErrorIface);
 });
 
 afterAll(() => {
