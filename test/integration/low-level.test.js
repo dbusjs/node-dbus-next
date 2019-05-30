@@ -1,11 +1,15 @@
 let dbus = require('../../');
 let Message = dbus.Message;
 let {
-  MESSAGE_TYPE_METHOD_CALL,
-  MESSAGE_TYPE_METHOD_RETURN,
-  MESSAGE_TYPE_SIGNAL,
-  MESSAGE_TYPE_ERROR
-} = dbus;
+  METHOD_CALL,
+  METHOD_RETURN,
+  SIGNAL,
+  ERROR
+} = dbus.MessageType;
+
+let {
+  NO_REPLY_EXPECTED
+} = dbus.MessageFlag;
 
 let bus1 = dbus.sessionBus();
 let bus2 = dbus.sessionBus();
@@ -59,7 +63,7 @@ test('send a method call between buses', async () => {
   let reply = await bus2.call(msg);
 
   expect(bus1._methodHandlers.length).toEqual(0);
-  expect(reply.type).toEqual(MESSAGE_TYPE_METHOD_RETURN);
+  expect(reply.type).toEqual(METHOD_RETURN);
   expect(reply.sender).toEqual(bus1.name);
   expect(reply.signature).toEqual('s');
   expect(reply.body).toEqual(['got it']);
@@ -67,7 +71,7 @@ test('send a method call between buses', async () => {
 
   let errorReturnHandler = function(sent) {
     if (sent.serial === msg.serial) {
-      expect(sent.type).toEqual(MESSAGE_TYPE_METHOD_CALL);
+      expect(sent.type).toEqual(METHOD_CALL);
       expect(sent.path).toEqual(msg.path);
       expect(sent.serial).toEqual(msg.serial);
       expect(sent.interface).toEqual(msg.interface);
@@ -91,7 +95,7 @@ test('send a method call between buses', async () => {
 
   expect(error).not.toBeNull();
   expect(error.reply).toBeInstanceOf(Message);
-  expect(error.reply.type).toEqual(MESSAGE_TYPE_ERROR);
+  expect(error.reply.type).toEqual(ERROR);
   expect(error.reply.sender).toEqual(bus1.name);
   expect(error.reply.errorName).toEqual('org.test.Error');
   expect(error.reply.signature).toEqual('s');
@@ -110,7 +114,7 @@ test('send a method call between buses', async () => {
     });
   });
 
-  msg.flags = dbus.MESSAGE_FLAG_NO_REPLY_EXPECTED;
+  msg.flags = NO_REPLY_EXPECTED;
   let result = await bus2.call(msg);
   expect(result).toBeNull();
   reply = await waitForMessage;
@@ -139,7 +143,7 @@ test('send a signal between buses', async () => {
   bus2.send(Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']));
   let signal = await waitForMessage;
 
-  expect(signal.type).toEqual(MESSAGE_TYPE_SIGNAL);
+  expect(signal.type).toEqual(SIGNAL);
   expect(signal.path).toEqual('/org/test/path');
   expect(signal.interface).toEqual('org.test.interface');
   expect(signal.member).toEqual('SomeSignal');
