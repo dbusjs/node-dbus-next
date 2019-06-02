@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.7.1
+
+This release contains breaking changes, bugfixes, and features.
+
+* Fix bus name validator for ProxyObject (#27)
+* Move all constants to enum classes (breaking)
+* Remove the `Name` class (breaking) (#22)
+* Remove the `NameExistsError` (breaking)
+* Enable TCP support (#26)
+* Use nornagons put fork
+
 ## v0.6.1
 
 This release contains new major features.
