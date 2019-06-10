@@ -6,11 +6,11 @@ const program = require('commander');
 const dbus = require('../');
 const Message = dbus.Message;
 const {
-  MESSAGE_TYPE_METHOD_RETURN,
-  MESSAGE_TYPE_ERROR,
-  MESSAGE_TYPE_SIGNAL,
-  MESSAGE_TYPE_METHOD_CALL
-} = dbus;
+  METHOD_RETURN,
+  ERROR,
+  SIGNAL,
+  METHOD_CALL
+} = dbus.MessageType;
 const {
   isObjectPathValid,
   isMemberNameValid,
@@ -69,10 +69,10 @@ if (!isMemberNameValid(member)) {
 }
 
 const types = {
-  'METHOD_RETURN': MESSAGE_TYPE_METHOD_RETURN,
-  'ERROR': MESSAGE_TYPE_ERROR,
-  'SIGNAL': MESSAGE_TYPE_SIGNAL,
-  'METHOD_CALL': MESSAGE_TYPE_METHOD_CALL
+  'METHOD_RETURN': METHOD_RETURN,
+  'ERROR': ERROR,
+  'SIGNAL': SIGNAL,
+  'METHOD_CALL': METHOD_CALL
 };
 
 let type = types[program.type];
@@ -81,9 +81,9 @@ if (program.type && !type) {
   exitError(`got invalid message type: ${program.type}`);
 }
 
-type = type || MESSAGE_TYPE_METHOD_CALL;
+type = type || METHOD_CALL;
 
-if (type === MESSAGE_TYPE_ERROR || type === MESSAGE_TYPE_METHOD_RETURN) {
+if (type === ERROR || type === METHOD_RETURN) {
   exitError('only METHOD_CALL and SIGNAL types are currently supported');
 }
 
@@ -127,7 +127,7 @@ let message = new Message({
   body: body
 });
 
-if (type === MESSAGE_TYPE_METHOD_CALL) {
+if (type === METHOD_CALL) {
   bus.call(message)
     .then((reply) => {
       console.log(JSON.stringify(reply, null, 2));
