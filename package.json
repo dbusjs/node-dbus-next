@@ -51,13 +51,13 @@
     "@babel/plugin-syntax-bigint": "^7.2.0",
     "@babel/plugin-transform-async-to-generator": "^7.3.4",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.8.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "commander": "^2.19.0",
     "handlebars": "^4.1.0",
     "jest": "^24.1.0",
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.6.3"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",
