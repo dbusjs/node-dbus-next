@@ -30,7 +30,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "http://github.com/acrisci/node-dbus-next.git"
+    "url": "http://github.com/dbusjs/node-dbus-next.git"
   },
   "dependencies": {
     "event-stream": "3.3.4",

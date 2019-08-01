@@ -67,7 +67,7 @@ properties.on('PropertiesChanged', (iface, changed, invalidated) => {
 });
 ```
 
-For a complete example, see the [MPRIS client](https://github.com/acrisci/node-dbus-next/blob/master/examples/mpris.js) example which can be used to control media players on the command line.
+For a complete example, see the [MPRIS client](https://github.com/dbusjs/node-dbus-next/blob/master/examples/mpris.js) example which can be used to control media players on the command line.
 
 ## The Service Interface
 
@@ -250,7 +250,7 @@ For more information on the DBus type system, see [the specification](https://db
 
 ## Contributing
 
-Contributions are welcome. Development happens on [Github](https://github.com/acrisci/node-dbus-next).
+Contributions are welcome. Development happens on [Github](https://github.com/dbusjs/node-dbus-next).
 
 ## Similar Projects
 
