@@ -94,17 +94,30 @@ test('test that signals work correctly', async () => {
 
   let onHelloWorld = jest.fn();
   let onSignalMultiple = jest.fn();
+  let onSignalMultiple2 = jest.fn();
   let onSignalComplicated = jest.fn();
 
-  test.on('HelloWorld', onHelloWorld);
+  test.once('HelloWorld', onHelloWorld);
   test.on('SignalMultiple', onSignalMultiple);
+  test.on('SignalMultiple', onSignalMultiple2);
   test.on('SignalComplicated', onSignalComplicated);
 
   await test.EmitSignals();
 
   expect(onHelloWorld).toHaveBeenCalledWith('hello');
   expect(onSignalMultiple).toHaveBeenCalledWith('hello', 'world');
+  expect(onSignalMultiple2).toHaveBeenCalledWith('hello', 'world');
   expect(onSignalComplicated).toHaveBeenCalledWith(testIface.complicated);
+
+  // removing the event listener on the interface should remove the event
+  // listener on the bus as well
+  expect(bus._signals.eventNames().length).toEqual(2);
+  test.removeListener('SignalMultiple', onSignalMultiple);
+  expect(bus._signals.eventNames().length).toEqual(2);
+  test.removeListener('SignalMultiple', onSignalMultiple2);
+  expect(bus._signals.eventNames().length).toEqual(1);
+  test.removeListener('SignalComplicated', onSignalComplicated);
+  expect(bus._signals.eventNames().length).toEqual(0);
 });
 
 test('signals dont get mixed up between names that define objects on the same path and interface', async () => {
