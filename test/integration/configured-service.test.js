@@ -15,7 +15,18 @@ bus.on('error', (err) => {
 });
 
 class ConfiguredTestInterface extends Interface {
-  SomeProperty = 'foo';
+  constructor(name) {
+    super(name);
+    this._someProperty = 'foo';
+  }
+
+  get SomeProperty() {
+    return this._someProperty;
+  }
+
+  set SomeProperty(value) {
+    this._someProperty = value;
+  }
 
   Echo(what) {
     return what;
