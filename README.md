@@ -4,8 +4,6 @@ The next great DBus library for NodeJS.
 
 [Documentation](https://acrisci.github.io/doc/node-dbus-next/).
 
-*This project is under development and may make breaking changes in minor versions until 1.0.*
-
 ## About
 
 dbus-next is a fully featured high level library for DBus geared primarily towards integration of applications into Linux desktop and mobile environments.
@@ -24,8 +22,6 @@ dbus.setBigIntCompat(true);
 ```
 
 ## The Client Interface
-
-*The Client interface is somewhat stable*
 
 You can get a proxy object for a name on the bus with the `bus.getProxyObject()` function, passing the name and the path. The proxy object contains introspection data about the object including a list of nodes and interfaces. You can get an interface with the `object.getInterface()` function passing the name of the interface.
 
@@ -70,8 +66,6 @@ properties.on('PropertiesChanged', (iface, changed, invalidated) => {
 For a complete example, see the [MPRIS client](https://github.com/dbusjs/node-dbus-next/blob/master/examples/mpris.js) example which can be used to control media players on the command line.
 
 ## The Service Interface
-
-*The Service interface is somewhat stable*
 
 You can use the `Interface` class to define your interfaces. This interfaces uses the proposed [decorators syntax](https://github.com/tc39/proposal-decorators) which is not yet part of the ECMAScript standard, but should be included one day. Unfortunately, you'll need a [Babel plugin](https://www.npmjs.com/package/@babel/plugin-proposal-decorators) to make this code work for now.
 
