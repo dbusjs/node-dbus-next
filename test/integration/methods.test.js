@@ -19,6 +19,10 @@ bus.on('error', (err) => {
 });
 
 class MethodsInterface extends Interface {
+  expectedError() {
+    return new DBusError('org.test.iface.Error', 'something went wrong');
+  }
+
   @method({inSignature: 'v', outSignature: 'v'})
   Echo(what) {
     return what;
@@ -31,7 +35,7 @@ class MethodsInterface extends Interface {
 
   @method({inSignature: '', outSignature: ''})
   ThrowsError() {
-    throw new DBusError('org.test.iface.Error', 'something went wrong');
+    throw this.expectedError();
   }
 
   complicated1 = [
@@ -56,6 +60,16 @@ class MethodsInterface extends Interface {
 
   @method({inSignature: 'as', outSignature: ''})
   TakesList() {
+  }
+
+  @method({inSignature: 's', outSignature: 's'})
+  async AsyncEcho(what) {
+    return what;
+  }
+
+  @method({inSignature: '', outSignature: ''})
+  async AsyncError() {
+    throw this.expectedError();
   }
 }
 
@@ -108,8 +122,13 @@ test('that methods work correctly', async () => {
   expect(r2).toEqual(testIface.complicated2);
 
   let req = test.ThrowsError();
-  let expected = new DBusError('org.test.iface.Error', 'something went wrong');
-  await expect(req).rejects.toEqual(expected);
+  await expect(req).rejects.toEqual(testIface.expectedError());
+
+  req = await test.AsyncEcho('what');
+  expect(req).toEqual('what');
+
+  req = test.AsyncError();
+  await expect(req).rejects.toEqual(testIface.expectedError());
 });
 
 test('client method errors', async () => {
