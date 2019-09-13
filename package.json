@@ -21,6 +21,7 @@
     "examples": "examples"
   },
   "main": "index.js",
+  "types": "types.d.ts",
   "maintainers": [
     {
       "name": "Tony Crisci",
