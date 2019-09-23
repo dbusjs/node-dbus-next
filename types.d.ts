@@ -1,9 +1,21 @@
 
 declare module 'dbus-next' {
     import { EventEmitter } from "events";
-    
+
     export type ObjectPath = string;
     export type PropertyAccess = "read" | "write" | "readwrite";
+
+    export enum MessageType {
+        METHOD_CALL,
+        METHOD_RETURN,
+        ERROR,
+        SIGNAL,
+    }
+
+    export enum MessageFlag {
+        NO_REPLY_EXPECTED,
+        NO_AUTO_START,
+    }
 
 
     export namespace interface {
@@ -47,13 +59,39 @@ declare module 'dbus-next' {
         reply?: any;
         constructor(type: string, text: string, reply?: any);
     }
-    export interface Message {
-        serial: number;
-        type: number;
-        flags: number;
-        body?: any;
+
+    export interface MessageLike {
+        type?: MessageType;
+        serial?: number | null;
+        path?: string;
+        interface?: string;
+        member?: string;
+        errorName?: string;
+        replySerial?: string;
+        destination?: string;
+        sender?: string;
         signature?: string;
-        [key: string]: any;
+        body?: any[];
+        flags?: MessageFlag;
+    }
+    export class Message {
+        type: MessageType;
+        serial: number | null;
+        path: string;
+        interface: string;
+        member: string;
+        errorName: string;
+        replySerial: string;
+        destination: string;
+        sender: string;
+        signature: string;
+        body: any[];
+        flags: MessageFlag;
+
+        constructor(msg: MessageLike);
+        static newError(msg: string, errorName, errorText?: string): Message;
+        static newMethodReturn(msg: Message, signature?: string, body?: any[]): Message;
+        static newSignal(path: string, iface: string, name: string, signature?: string, body?: any[]): Message;
     }
 
     export class MessageBus {
