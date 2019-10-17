@@ -114,6 +114,12 @@ test('test that signals work correctly', async () => {
   expect(bus._signals.eventNames().length).toEqual(2);
   test.removeListener('SignalMultiple', onSignalMultiple);
   expect(bus._signals.eventNames().length).toEqual(2);
+
+  // removing the listener on a signal should not remove them all
+  onSignalMultiple2.mockClear()
+  await test.EmitSignals();
+  expect(onSignalMultiple2).toHaveBeenCalledWith('hello', 'world');
+
   test.removeListener('SignalMultiple', onSignalMultiple2);
   expect(bus._signals.eventNames().length).toEqual(1);
   test.removeListener('SignalComplicated', onSignalComplicated);
