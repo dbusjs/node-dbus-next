@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.1
+
+This release contains bugfixes and new features.
+
+* Update repository url to dbusjs org.
+* Fix memory leak for high level client signal match rules. (#39, #40)
+* Init proxy objects from xml string to avoid extra introspection. (4518825)
+* Add `configureMembers` to service interface as an alternative to decorators. (#32)
+* Allow async methods in the service interface. (#33)
+* Add TypeScript typings. (#28, #34)
+* Bugfix: correctly unmarshal unix socket 'h' type. (#35)
+* Support DBus monitor clients. (#41, #42)
+
 ## v0.7.1
 
 This release contains breaking changes, bugfixes, and features.
