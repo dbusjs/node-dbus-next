@@ -181,7 +181,7 @@ let methodCall = new Message({
   member: 'ListNames'
 });
 
-let reply = await bus.call(message);
+let reply = await bus.call(methodCall);
 console.log('names on the bus: ', reply.body[0]);
 
 // add a custom handler for a particular method
