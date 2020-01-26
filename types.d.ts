@@ -89,7 +89,7 @@ declare module 'dbus-next' {
         flags: MessageFlag;
 
         constructor(msg: MessageLike);
-        static newError(msg: string, errorName, errorText?: string): Message;
+        static newError(msg: string, errorName: string, errorText?: string): Message;
         static newMethodReturn(msg: Message, signature?: string, body?: any[]): Message;
         static newSignal(path: string, iface: string, name: string, signature?: string, body?: any[]): Message;
     }
