@@ -44,6 +44,7 @@ declare module 'dbus-next' {
         export class Interface extends EventEmitter {
             constructor(name: string);
             static configureMembers(members: { properties?: { [key: string]: PropertyOptions }, methods?: { [key: string]: MethodOptions }, signals?: { [key: string]: SignalOptions } }): void;
+            static emitPropertiesChanged(interface: Interface, changedProperties: { [key: string]: any }, invalidatedProperties: string[]): void
         }
         export function property(opts: PropertyOptions): PropertyDecorator;
         export function method(opts: MethodOptions): MethodDecorator;
