@@ -127,10 +127,9 @@ declare module 'dbus-next' {
 
     export type AuthMethod = 'EXTERNAL' | 'DBUS_COOKIE_SHA1' | 'ANONYMOUS';
 
-    export interface SessionBusOptions {
+    export interface BusOptions {
         authMethods?: AuthMethod[];
         busAddress?: string;
-        ayBuffer?: boolean;
     }
 
     export function systemBus(): MessageBus;
