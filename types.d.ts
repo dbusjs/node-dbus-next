@@ -133,5 +133,5 @@ declare module 'dbus-next' {
     }
 
     export function systemBus(): MessageBus;
-    export function sessionBus(options?: SessionBusOptions): MessageBus;
+    export function sessionBus(options?: BusOptions): MessageBus;
 }
