@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.8.2
+
+This release includes some bug fixes.
+
+* Include the TypeScript typings file in the package (#44)
+* Add some fixes for TypeScript types (#45, #46, #47)
+* Support unmarshalling messages in big endian (#36, #48)
+
 ## v0.8.1
 
 This release contains bugfixes and new features.
