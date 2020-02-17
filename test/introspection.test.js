@@ -26,6 +26,11 @@ class IntrospectionTestInterface extends Interface {
     return [ str, d ];
   }
 
+  @method({inSignature: '', outSignature: '', noReply: true})
+  NoReplyMethod() {
+
+  }
+
   @method({name: 'Overloaded', inSignature: 's', outSignature: 's'})
   overloaded1(str) {
     return str;
@@ -109,6 +114,11 @@ test('method xml introspection', () => {
 
   method = getMethod('DisabledMethod')[0];
   expect(method).not.toBeDefined();
+
+  method = getMethod('NoReplyMethod')[0];
+  expect(method).toBeDefined();
+  expect(method.annotation).toBeInstanceOf(Array);
+  expect(method.annotation[0]).toEqual({'$': { name: 'org.freedesktop.DBus.Method.NoReply', value: 'true' }});
 
   let overloaded = getMethod('Overloaded');
   expect(overloaded.length).toEqual(2);
