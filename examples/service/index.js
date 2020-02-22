@@ -48,6 +48,11 @@ class ExampleInterface extends Interface {
     throw new DBusError('org.test.iface.Error', 'something went wrong');
   }
 
+  @method({inSignature: '', outSignature: '', noReply: true})
+  NoReply() {
+
+  }
+
   @signal({signature: 's'})
   HelloWorld(value) {
     return value;
