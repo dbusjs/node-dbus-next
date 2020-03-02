@@ -121,6 +121,12 @@ class ExampleInterface extends Interface {
     throw new DBusError('org.test.iface.Error', 'something went wrong');
   }
 
+  @method({inSignature: '', outSignature: '', noReply: true})
+  NoReply() {
+    // by setting noReply to true, dbus-next will NOT send a return reply through dbus 
+    // after the method is called.
+  }
+
   @signal({signature: 's'})
   HelloWorld(value) {
     return value;
