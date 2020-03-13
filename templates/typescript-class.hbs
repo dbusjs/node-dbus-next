@@ -43,7 +43,7 @@ export class {{className $.name}} extends EventEmitter {
         return this.propertiesDBusInterface.Get(this.dbusInterfaceName, name);
     }
 
-    public setProperty(name: string, value: DBus.Variant): Promise<DBus.Variant> {
+    public setProperty(name: string, value: DBus.Variant): Promise<void> {
         return this.propertiesDBusInterface.Set(this.dbusInterfaceName, name, value);
     }
 
