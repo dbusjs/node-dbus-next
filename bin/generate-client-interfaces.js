@@ -33,9 +33,9 @@ program
     .option('--system', 'Use the system bus')
     .option('--session', 'Use the session bus')
     .option('-t, --template [path]', 'Template to use for interface generation')
-    .option('--full', 'Do not exclude DBus standart interfaces')
+    .option('--full', 'Do not exclude DBus standard interfaces')
     .option('-p, --prefix', 'Prefix class names with full interface path')
-    .option('-o, --output [path]', 'The output file path for Typescript classes (default: stdout)')
+    .option('-o, --output [path]', 'The output file path (default: stdout)')
     .arguments('<destination> <objectPath>')
     .parse(process.argv);
 
