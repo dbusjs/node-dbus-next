@@ -13,19 +13,36 @@ export class {{className $.name}} extends EventEmitter {
 
     constructor(dbusObject) {
         super();
+        this.dbusInterfaceName = '{{$.name}}';
+        this.hasPropertiesChangeListener = false;
         this.dbusObject = dbusObject;
         this.thisDBusInterface = dbusObject.getInterface('{{$.name}}');
         this.propertiesDBusInterface = dbusObject.getInterface('org.freedesktop.DBus.Properties');
 
         // forward property change events
-        this.propertiesDBusInterface.on('PropertiesChanged', (iface, changed, invalidated) => {
+        const forwardPropertyChange = (iface, changed, invalidated) => {
             if(iface === this.dbusInterfaceName) {
                 this.emit('PropertiesChanged', iface, changed, invalidated);
             }
-        });
+        }
+
         // forward all signals
-        this.on("newListener", this.thisDBusInterface.on.bind(this.thisDBusInterface));
-        this.on("removeListener", this.thisDBusInterface.removeListener.bind(this.thisDBusInterface));
+        this.on("newListener", (event, listener) => {
+            if(event === "PropertiesChanged" && !this.hasPropertiesChangeListener) {
+                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
+                this.hasPropertiesChangeListener = true;
+            } else {
+                this.thisDBusInterface.on(event, listener);
+            }
+        });
+        this.on("removeListener", (event, listener) => {
+            if(event === "PropertiesChanged" && this.hasPropertiesChangeListener) {
+                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
+                this.hasPropertiesChangeListener = false;
+            } else {
+                this.thisDBusInterface.removeListener(event, listener);
+            }
+        });
     }
 
     /***** Properties *****/

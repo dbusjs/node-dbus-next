@@ -16,21 +16,38 @@ export class {{className $.name}} extends EventEmitter {
     public propertiesDBusInterface: DBus.ClientInterface;
     public thisDBusInterface: DBus.ClientInterface;
 
+    private hasPropertiesChangeListener: boolean = false;
+
     constructor(dbusObject: DBus.ProxyObject) {
         super();
         this.dbusObject = dbusObject;
-        this.thisDBusInterface = dbusObject.getInterface('{{$.name}}');
-        this.propertiesDBusInterface = dbusObject.getInterface('org.freedesktop.DBus.Properties');
+        this.thisDBusInterface = this.dbusObject.getInterface('{{$.name}}');
+        this.propertiesDBusInterface = this.dbusObject.getInterface('org.freedesktop.DBus.Properties');
 
         // forward property change events
-        this.propertiesDBusInterface.on('PropertiesChanged', (iface: string, changed: any, invalidated: any) => {
+        const forwardPropertyChange = (iface: string, changed: any, invalidated: any) => {
             if(iface === this.dbusInterfaceName) {
                 this.emit('PropertiesChanged', iface, changed, invalidated);
             }
-        });
+        }
+
         // forward all signals
-        this.on("newListener", this.thisDBusInterface.on.bind(this.thisDBusInterface));
-        this.on("removeListener", this.thisDBusInterface.removeListener.bind(this.thisDBusInterface));
+        this.on("newListener", (event, listener) => {
+            if(event === "PropertiesChanged" && !this.hasPropertiesChangeListener) {
+                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
+                this.hasPropertiesChangeListener = true;
+            } else {
+                this.thisDBusInterface.on(event, listener);
+            }
+        });
+        this.on("removeListener", (event, listener) => {
+            if(event === "PropertiesChanged" && this.hasPropertiesChangeListener) {
+                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
+                this.hasPropertiesChangeListener = false;
+            } else {
+                this.thisDBusInterface.removeListener(event, listener);
+            }
+        });
     }
 
     /***** Properties *****/
