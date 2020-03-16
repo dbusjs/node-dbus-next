@@ -260,7 +260,7 @@ async function templateXmlData(template, data) {
         interfaces.push(iface);
     }
 
-    return template({ interfaces: interfaces, xmlData: data, objectPath, serviceName: destination });
+    return template({ interfaces: interfaces, xmlData: new Handlebars.SafeString(data), objectPath, serviceName: destination });
 }
 
 async function main() {
