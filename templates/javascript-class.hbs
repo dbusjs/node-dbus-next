@@ -22,7 +22,6 @@ export class {{className $.name}} extends EventEmitter {
     constructor(dbusObject) {
         super();
         this.dbusInterfaceName = '{{$.name}}';
-        this.hasPropertiesChangeListener = false;
         this.dbusObject = dbusObject;
         this.thisDBusInterface = dbusObject.getInterface('{{$.name}}');
         this.propertiesDBusInterface = dbusObject.getInterface('org.freedesktop.DBus.Properties');
@@ -36,17 +35,15 @@ export class {{className $.name}} extends EventEmitter {
 
         // forward all signals
         this.on("newListener", (event, listener) => {
-            if(event === "PropertiesChanged" && !this.hasPropertiesChangeListener) {
+            if(event === "PropertiesChanged" && this.listenerCount('PropertiesChanged') === 0) {
                 this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
-                this.hasPropertiesChangeListener = true;
             } else {
                 this.thisDBusInterface.on(event, listener);
             }
         });
         this.on("removeListener", (event, listener) => {
-            if(event === "PropertiesChanged" && this.hasPropertiesChangeListener) {
-                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
-                this.hasPropertiesChangeListener = false;
+            if(event === "PropertiesChanged" && this.listenerCount('PropertiesChanged') === 0) {
+                this.propertiesDBusInterface.removeListener('PropertiesChanged', forwardPropertyChange);
             } else {
                 this.thisDBusInterface.removeListener(event, listener);
             }

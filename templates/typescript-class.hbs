@@ -19,8 +19,6 @@ export class {{className $.name}} extends EventEmitter {
     public propertiesDBusInterface: DBus.ClientInterface;
     public thisDBusInterface: DBus.ClientInterface;
 
-    private hasPropertiesChangeListener: boolean = false;
-
     public static Connect(bus: DBus.MessageBus, objectPath: string, xml: string = XMLObjectData): Promise<{{className $.name}}> {
         return bus.getProxyObject('{{serviceName}}', objectPath, xml).then((obj) => new {{className $.name}}(obj));
     }
@@ -40,17 +38,15 @@ export class {{className $.name}} extends EventEmitter {
 
         // forward all signals
         this.on("newListener", (event, listener) => {
-            if(event === "PropertiesChanged" && !this.hasPropertiesChangeListener) {
+            if(event === "PropertiesChanged" && this.listenerCount('PropertiesChanged') === 0) {
                 this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
-                this.hasPropertiesChangeListener = true;
             } else {
                 this.thisDBusInterface.on(event, listener);
             }
         });
         this.on("removeListener", (event, listener) => {
-            if(event === "PropertiesChanged" && this.hasPropertiesChangeListener) {
-                this.propertiesDBusInterface.on('PropertiesChanged', forwardPropertyChange);
-                this.hasPropertiesChangeListener = false;
+            if(event === "PropertiesChanged" && this.listenerCount('PropertiesChanged') === 0) {
+                this.propertiesDBusInterface.removeListener('PropertiesChanged', forwardPropertyChange);
             } else {
                 this.thisDBusInterface.removeListener(event, listener);
             }
