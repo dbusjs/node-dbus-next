@@ -16,7 +16,7 @@ export class {{className $.name}} extends EventEmitter {
 
     static Connect(bus, objectPath, xml) {
         if(!xml) { xml = XMLObjectData; }
-        return bus.getProxyObject('{{serviceName}}', objectPath, xml).then((obj) => new {{className $.name}}(obj));
+        return bus.getProxyObject('{{../serviceName}}', objectPath, xml).then((obj) => new {{className $.name}}(obj));
     }
 
     constructor(dbusObject) {

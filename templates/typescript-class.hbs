@@ -20,7 +20,7 @@ export class {{className $.name}} extends EventEmitter {
     public thisDBusInterface: DBus.ClientInterface;
 
     public static Connect(bus: DBus.MessageBus, objectPath: string, xml: string = XMLObjectData): Promise<{{className $.name}}> {
-        return bus.getProxyObject('{{serviceName}}', objectPath, xml).then((obj) => new {{className $.name}}(obj));
+        return bus.getProxyObject('{{../serviceName}}', objectPath, xml).then((obj) => new {{className $.name}}(obj));
     }
 
     constructor(dbusObject: DBus.ProxyObject) {
