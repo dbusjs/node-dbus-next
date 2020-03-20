@@ -53,6 +53,8 @@ declare module 'dbus-next' {
     export class Variant<T = any> {
         signature: string;
         value: T;
+        constructor();
+        constructor(signatur: string, value: T);
     }
     export class DBusError extends Error {
         type: string;
@@ -96,8 +98,7 @@ declare module 'dbus-next' {
     }
 
     export class MessageBus {
-        getProxyObject(name: string, path: string): Promise<ProxyObject>;
-        getProxyObject(name: string, path: string, xml: string): Promise<ProxyObject>;
+        getProxyObject(name: string, path: string, xml?: string): Promise<ProxyObject>;
         disconnect(): void;
 
         export(path: ObjectPath, interface: interface.Interface): void;
@@ -133,6 +134,7 @@ declare module 'dbus-next' {
         busAddress?: string;
     }
 
+    export function setBigIntCompat(state: boolean): void;
     export function systemBus(): MessageBus;
     export function sessionBus(options?: BusOptions): MessageBus;
 }
