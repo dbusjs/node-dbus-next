@@ -27,16 +27,19 @@ function exitError(message) {
     console.error(message);
     process.exit(1);
 }
+const readFile = (fs.promises ? fs.promises.readFile : fs.readFileSync);
+const writeFile = (fs.promises ? fs.promises.writeFile : fs.writeFileSync);
 
 program
-    .version('0.1.0')
+    .version('0.1.1')
     .description('Generate an interface from a DBus object')
     .option('--system', 'Use the system bus')
     .option('--session', 'Use the session bus')
     .option('-t, --template [path]', 'Template to use for interface generation')
     .option('--full', 'Do not exclude DBus standard interfaces')
     .option('-p, --prefix', 'Prefix class names with full interface path')
-    .option('-o, --output [path]', 'The output file path (default: stdout)')
+    .option('-o, --output [path]', 'The output file or directory (default: stdout)')
+    .option('-r, --recursive', 'Recursively decent to child nodes (requires --output to be directory')
     .arguments('<destination> <objectPath>')
     .parse(process.argv);
 
@@ -65,13 +68,26 @@ if (!isBusNameValid(destination) && !destination.match(/^:\d+/)) {
     exitError(`got invalid destination: ${destination}`);
 }
 
-program.template = program.template || "javascript-class";
-if(path.basename(program.template, "hbs") === program.template) {
-    program.template = path.resolve(__dirname, "..", "templates", path.basename(program.template, "hbs") + ".hbs");
+program.template = program.template || "javascript-class.js";
+if (path.basename(program.template, ".hbs") === program.template) {
+    program.template = path.resolve(__dirname, "..", "templates", path.basename(program.template, ".hbs") + ".hbs");
 }
+const templateExt = path.extname(path.basename(program.template, ".hbs"));
 
 if (!fs.existsSync(program.template)) {
     exitError(`template file '${program.template}' does not exists`);
+}
+
+if (program.recursive && !program.output) {
+    exitError("Output directory is required for recursive operation");
+}
+
+if (program.recursive && !fs.existsSync(program.output)) {
+    exitError(`Output directory '${program.output}' does not exists`);
+}
+
+if (program.recursive && !fs.lstatSync(program.output).isDirectory()) {
+    exitError(`Output directory '${program.output}' is not a directory`);
 }
 
 const bus = (program.system ? dbus.systemBus() : dbus.sessionBus());
@@ -187,8 +203,11 @@ const helpers = {
 
             return name.slice(0, -1 * dots).join('');
         } else {
-            const path = ifaceName.split(".");
-            const name = path[path.length - 1];
+            let name = ifaceName.replace(destination, "").replace(/\./g, "");
+            if (name === "") {
+                const path = ifaceName.split(".");
+                name = path[path.length - 1];
+            }
             return name.charAt(0).toUpperCase() + name.slice(1);
         }
     },
@@ -236,49 +255,103 @@ async function parseXml(data) {
     });
 }
 
-async function templateXmlData(template, data) {
+async function getInterfaceDataFromXml(data, objectPath) {
     let interfaces = [];
+    let subNodes = [];
 
     let xml = await parseXml(data);
     if (!xml.node) {
         console.error('xml document did not contain a root node')
         process.exit(1);
     }
-    if (!xml.node.interface) {
-        console.error('xml document did not contain any interfaces');
-        process.exit(1);
-    }
+    if (xml.node.interface) {
+        for (let iface of xml.node.interface) {
+            if (!iface['$'] || !iface['$'].name) {
+                console.log('got an interface without a name')
+                process.exit(1);
+            }
+        }
 
-    for (let iface of xml.node.interface) {
-        if (!iface['$'] || !iface['$'].name) {
-            console.log('got an interface without a name')
-            process.exit(1);
+        for (let iface of xml.node.interface) {
+            if (!program.full && iface['$'].name.startsWith('org.freedesktop.DBus.')) {
+                // ignore standard interfaces
+                continue;
+            }
+            interfaces.push(iface);
         }
     }
 
-    for (let iface of xml.node.interface) {
-        if (!program.full && iface['$'].name.startsWith('org.freedesktop.DBus.')) {
-            // ignore standard interfaces
-            continue;
-        }
-        interfaces.push(iface);
-    }
+    subNodes = (xml.node.node || []).map(n => n["$"].name);
 
-    return template({ interfaces: interfaces, xmlData: new Handlebars.SafeString(data), objectPath, serviceName: destination });
+    return {
+        interfaces: interfaces,
+        subNodes: subNodes,
+        xmlData: new Handlebars.SafeString(data),
+        objectPath: objectPath,
+        serviceName: destination
+    };
 }
 
 async function main() {
-    const templateStr = await (fs.promises ? fs.promises.readFile : fs.readFileSync)(program.template, { encoding: "utf8" });
+    const templateStr = await readFile(program.template, { encoding: "utf8" });
 
     const template = Handlebars.compile(templateStr);
-    const desc = await getInterfaceDesc(destination, objectPath);
-    //console.log(desc);
-    const result = await templateXmlData(template, desc);
 
-    if (program.output) {
-        await (fs.promises ? fs.promises.writeFile : fs.writeFileSync)(program.output, result);
+    if (program.recursive) {
+        const interfaceList = [];
+        const nodeList = [objectPath];
+        while (nodeList.length > 0) {
+            const currentNode = nodeList.pop();
+            console.log("Visit " + currentNode);
+            const desc = await getInterfaceDesc(destination, currentNode);
+            const interfaceData = await getInterfaceDataFromXml(desc, currentNode);
+
+            nodeList.push(...interfaceData.subNodes.map(name => currentNode + "/" + name));
+            for (const ifs of interfaceData.interfaces) {
+                const foundInterface = interfaceList.find(i => i.name === ifs['$'].name);
+                if (foundInterface) {
+                    foundInterface.objectPaths.push(interfaceData.objectPath);
+                } else {
+                    interfaceList.push({
+                        name: ifs['$'].name,
+                        interface: ifs,
+                        objectPaths: [interfaceData.objectPath],
+                        xmlData: interfaceData.xmlData,
+                        serviceName: interfaceData.serviceName,
+                    });
+                }
+            }
+
+            //const result = template(interfaceData);
+        }
+
+        for (const ifs of interfaceList) {
+            let name = ifs.name.replace(ifs.serviceName, "").replace(/\./g, "-").replace(/^-/, "");
+            if (name === "") {
+                const path = ifs.name.split(".");
+                name = path[path.length - 1];
+            }
+            console.log("Process %s as %s", ifs.name, name);
+            ifs.filename = name + templateExt;
+            ifs.result = template({
+                interfaces: [ifs.interface],
+                xmlData: ifs.objectPaths.length === 1 ? ifs.xmlData : undefined,
+                objectPath: ifs.objectPaths[0], // TODO: get common path
+                serviceName: ifs.serviceName
+            });
+
+            // TODO: Check for duplicate names
+            await writeFile(path.join(program.output, ifs.filename), ifs.result);
+        }
     } else {
-        console.log(result);
+        const desc = await getInterfaceDesc(destination, objectPath);
+        const interfaceData = await getInterfaceDataFromXml(desc, objectPath);
+        const result = template(interfaceData);
+        if (program.output) {
+            await writeFile(program.output, result);
+        } else {
+            console.log(result);
+        }
     }
     return 0;
 }
