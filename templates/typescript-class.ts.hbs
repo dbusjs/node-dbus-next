@@ -75,18 +75,18 @@ export class {{className $.name}} extends EventEmitter {
     {{#each property}}
     //@property({ name: '{{$.name}}', signature: '{{$.type}}', access: {{accessConst $.access}} }){{#ifeq $.access "read"}}
     public {{$.name}}(): Promise<{{tsType $.type}}> {
-        return this.propertiesDBusInterface.Get(this.dbusInterfaceName, '{{$.name}}');
+        return this.propertiesDBusInterface.Get(this.dbusInterfaceName, '{{$.name}}'){{#unlesseq $.type "v"}}.then((variant) => variant.value){{/unlesseq}};
     }{{/ifeq}}{{#ifeq $.access "write"}}
     public {{$.name}}(value: {{tsType $.type}}): Promise<void> {
-        return this.propertiesDBusInterface.Set(this.dbusInterfaceName, '{{$.name}}', value);
+        return this.propertiesDBusInterface.Set(this.dbusInterfaceName, '{{$.name}}', {{#ifeq $.type "v"}}value{{else}}new DBus.Variant("{{$.type}}", value){{/ifeq}});
     }{{/ifeq}}{{#ifeq $.access "readwrite"}}
     public {{$.name}}(): Promise<{{tsType $.type}}>;
     public {{$.name}}(value: {{tsType $.type}}): Promise<void>;
     public {{$.name}}(value?: {{tsType $.type}}): Promise<any> {
         if(value !== undefined) {
-            return this.propertiesDBusInterface.Set(this.dbusInterfaceName, '{{$.name}}', value);
+            return this.propertiesDBusInterface.Set(this.dbusInterfaceName, '{{$.name}}', {{#ifeq $.type "v"}}value{{else}}new DBus.Variant("{{$.type}}", value){{/ifeq}});
         } else {
-            return this.propertiesDBusInterface.Get(this.dbusInterfaceName, '{{$.name}}');
+            return this.propertiesDBusInterface.Get(this.dbusInterfaceName, '{{$.name}}'){{#unlesseq $.type "v"}}.then((variant) => variant.value){{/unlesseq}};
         }
     }{{/ifeq}}
 

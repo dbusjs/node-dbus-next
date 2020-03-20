@@ -168,6 +168,10 @@ const helpers = {
         if (a == b) { return options.fn(this); }
         return options.inverse(this);
     },
+    unlesseq(a, b, options) {
+        if (a != b) { return options.fn(this); }
+        return options.inverse(this);
+    },
 
     tsType: tsType,
     outType(args) {
