@@ -331,16 +331,27 @@ async function main() {
                 const path = ifs.name.split(".");
                 name = path[path.length - 1];
             }
+            let objectPath = ifs.objectPaths[0];
+            if(ifs.objectPaths.length > 1) {
+                // create a common path with wildcards
+                objectPath = ifs.objectPaths
+                    .map(p => p.split("/")) // split all on /
+                    .reduce(($, row) => row.map((_, i) => [...($[i] || []), row[i]]), []) // transpose arrays
+                    .map(frag => frag.filter((v, i, a) => a.indexOf(v) === i)) // make fragments unique
+                    .map(frag => frag.length === 1 ? frag[0] : "*") // replace non unique fragments with *
+                    .join("/") // rebuild path
+            }
+
             console.log("Process %s as %s", ifs.name, name);
             ifs.filename = name + templateExt;
             ifs.result = template({
                 interfaces: [ifs.interface],
                 xmlData: ifs.objectPaths.length === 1 ? ifs.xmlData : undefined,
-                objectPath: ifs.objectPaths[0], // TODO: get common path
+                objectPath: objectPath, 
                 serviceName: ifs.serviceName
             });
 
-            // TODO: Check for duplicate names
+            // TODO: Check for duplicate file names
             await writeFile(path.join(program.output, ifs.filename), ifs.result);
         }
     } else {
