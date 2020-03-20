@@ -132,7 +132,7 @@ function tsType(type) {
             return "number";
         case "x":
         case "t":
-            return "DBus.BigInt";
+            return "BigInt";
         case "g":
         case "s":
             return "string";
