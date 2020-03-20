@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const path = require('path');
 const xml2js = require('xml2js');
 const Handlebars = require('handlebars');
 let parser = new xml2js.Parser();
@@ -64,7 +65,10 @@ if (!isBusNameValid(destination) && !destination.match(/^:\d+/)) {
     exitError(`got invalid destination: ${destination}`);
 }
 
-program.template = program.template || __dirname + "/../templates/javascript-class.hbs";
+program.template = program.template || "javascript-class";
+if(path.basename(program.template, "hbs") === program.template) {
+    program.template = path.resolve(__dirname, "..", "templates", path.basename(program.template, "hbs") + ".hbs");
+}
 
 if (!fs.existsSync(program.template)) {
     exitError(`template file '${program.template}' does not exists`);
