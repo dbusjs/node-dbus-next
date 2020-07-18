@@ -97,7 +97,7 @@ declare module 'dbus-next' {
         static newSignal(path: string, iface: string, name: string, signature?: string, body?: any[]): Message;
     }
 
-    export class MessageBus {
+    export class MessageBus extends EventEmitter {
         getProxyObject(name: string, path: string, xml?: string): Promise<ProxyObject>;
         disconnect(): void;
 
@@ -112,6 +112,10 @@ declare module 'dbus-next' {
         removeMethodHandler(handler: Function): void;
         call(msg: Message): Promise<Message | null>;
         send(msg: Message): void;
+
+        on(event: 'connect', listener: () => void): this;
+        on(event: 'message', listener: (msg: Message) => void): this
+        on(event: 'error', listener: (err: any) => void): this
     }
     export interface ProxyObject {
         bus: MessageBus;
