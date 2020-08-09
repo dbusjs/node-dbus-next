@@ -72,6 +72,24 @@ afterAll(() => {
   bus.disconnect();
 });
 
+test('regression: getter is not called after configureMembers (#60)', () => {
+  class TestInterface extends Interface {
+    constructor() {
+      this._myPrivateProperty = 'HELLO'
+    }
+
+    get myProperty() {
+      return this._myPrivateProperty.toLowerCase()
+    }
+  }
+
+  TestInterface.configureMembers({
+    properties: {
+      myProperty: { signature: 's' }
+    }
+  })
+});
+
 test('configured interface', async () => {
   let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   let test = object.getInterface(TEST_IFACE);
