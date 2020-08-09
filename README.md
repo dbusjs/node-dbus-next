@@ -2,7 +2,9 @@
 
 The next great DBus library for NodeJS.
 
-[Documentation](https://acrisci.github.io/doc/node-dbus-next/).
+[Documentation](https://acrisci.github.io/doc/node-dbus-next/)
+
+[Chat](https://discord.gg/UdbXHVX)
 
 ## About
 
