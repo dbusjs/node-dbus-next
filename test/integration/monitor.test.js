@@ -7,6 +7,7 @@ let {
 let monitor = dbus.sessionBus();
 let bus1 = dbus.sessionBus();
 let bus2 = dbus.sessionBus();
+let bus3 = dbus.sessionBus();
 
 bus1.on('error', (err) => {
   console.log(`bus1 got unexpected connection error:\n${err.stack}`);
@@ -19,7 +20,7 @@ monitor.on('error', (err) => {
 });
 
 beforeAll(async () => {
-  let connect = [bus1, bus2, monitor].map((bus) => {
+  let connect = [bus1, bus2, bus3, monitor].map((bus) => {
     return new Promise((resolve) => {
       bus.on('connect', resolve);
     });
@@ -40,6 +41,7 @@ beforeAll(async () => {
 afterAll(() => {
   bus1.disconnect();
   bus2.disconnect();
+  bus3.disconnect();
   monitor.disconnect();
 });
 
@@ -81,6 +83,13 @@ test('monitor a method call', async () => {
     member: 'TestMethod',
     signature: 's',
     body: ['hello']
+  }));
+
+  await bus3.call(new Message({
+    destination: 'org.freedesktop.DBus',
+    path: '/org/freedesktop/DBus',
+    interface: 'org.freedesktop.DBus.Peer',
+    member: 'Ping'
   }));
 
   expect(messages.length).toEqual(2);
