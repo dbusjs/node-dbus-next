@@ -62,5 +62,5 @@ test('what happens when a bus disconnects', async () => {
   test.on('SomeSignal', fn);
   await ping(bus2);
   bus2.disconnect();
-  test.off('SomeSignal', fn);
+  test.removeListener('SomeSignal', fn);
 });
