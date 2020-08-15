@@ -1,31 +1,31 @@
-let dbus = require('../../');
-let { ping } = require('../util');
+const dbus = require('../../');
+const { ping } = require('../util');
 
-let {
-  Interface, method, signal,
+const {
+  Interface, method, signal
 } = dbus.interface;
 
 const TEST_NAME = 'org.test.disconnect';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
-let bus = dbus.sessionBus();
+const bus = dbus.sessionBus();
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
 class TestInterface extends Interface {
-  @method({inSignature: 's', outSignature: 's'})
-  Echo(what) {
+  @method({ inSignature: 's', outSignature: 's' })
+  Echo (what) {
     return what;
   }
 
   @signal({})
-  SomeSignal() {
+  SomeSignal () {
   }
 }
 
-let testIface = new TestInterface(TEST_IFACE);
+const testIface = new TestInterface(TEST_IFACE);
 
 beforeAll(async () => {
   await bus.requestName(TEST_NAME);
@@ -58,7 +58,7 @@ test('what happens when a bus disconnects', async () => {
   await ping(bus2);
   obj = await bus2.getProxyObject(TEST_NAME, TEST_PATH);
   test = obj.getInterface(TEST_IFACE);
-  let fn = () => {};
+  const fn = () => {};
   test.on('SomeSignal', fn);
   await ping(bus2);
   bus2.disconnect();

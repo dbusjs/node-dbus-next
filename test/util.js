@@ -1,7 +1,7 @@
-let dbus = require('../');
-let Message = dbus.Message;
+const dbus = require('../');
+const Message = dbus.Message;
 
-async function ping(bus) {
+async function ping (bus) {
   return bus.call(new Message({
     destination: 'org.freedesktop.DBus',
     path: '/org/freedesktop/DBus',

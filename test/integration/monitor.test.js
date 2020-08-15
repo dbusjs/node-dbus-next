@@ -1,13 +1,13 @@
-let dbus = require('../../');
-let Message = dbus.Message;
-let {
+const dbus = require('../../');
+const Message = dbus.Message;
+const {
   SIGNAL
 } = dbus.MessageType;
 
-let monitor = dbus.sessionBus();
-let bus1 = dbus.sessionBus();
-let bus2 = dbus.sessionBus();
-let bus3 = dbus.sessionBus();
+const monitor = dbus.sessionBus();
+const bus1 = dbus.sessionBus();
+const bus2 = dbus.sessionBus();
+const bus3 = dbus.sessionBus();
 
 bus1.on('error', (err) => {
   console.log(`bus1 got unexpected connection error:\n${err.stack}`);
@@ -20,7 +20,7 @@ monitor.on('error', (err) => {
 });
 
 beforeAll(async () => {
-  let connect = [bus1, bus2, bus3, monitor].map((bus) => {
+  const connect = [bus1, bus2, bus3, monitor].map((bus) => {
     return new Promise((resolve) => {
       bus.on('connect', resolve);
     });
@@ -45,7 +45,7 @@ afterAll(() => {
   monitor.disconnect();
 });
 
-async function waitForMessage(bus) {
+async function waitForMessage (bus) {
   return new Promise((resolve) => {
     bus.once('message', (msg) => {
       resolve(msg);
@@ -54,22 +54,22 @@ async function waitForMessage(bus) {
 }
 
 test('monitor a signal', async () => {
-  let signal = Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']);
+  const signal = Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']);
   bus1.send(signal);
-  let msg = await waitForMessage(monitor);
+  const msg = await waitForMessage(monitor);
   expect(msg.type).toEqual(SIGNAL);
   expect(msg.sender).toEqual(bus1.name);
-  expect(msg.serial).toEqual(signal.serial)
+  expect(msg.serial).toEqual(signal.serial);
 });
 
 test('monitor a method call', async () => {
-  let messages = [];
-  let monitorHandler = function(message) {
+  const messages = [];
+  const monitorHandler = function (message) {
     messages.push(message);
   };
   monitor.on('message', monitorHandler);
 
-  let messageHandler = function(sent) {
+  const messageHandler = function (sent) {
     bus1.send(Message.newMethodReturn(sent, 's', ['got it']));
     return true;
   };

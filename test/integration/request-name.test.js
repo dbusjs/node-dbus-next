@@ -1,30 +1,30 @@
-let dbus = require('../../');
+const dbus = require('../../');
 
-let {
-  Message,
+const {
+  Message
 } = dbus;
 
 const {
   PRIMARY_OWNER,
   IN_QUEUE,
   EXISTS,
-  ALREADY_OWNER,
+  ALREADY_OWNER
 } = dbus.RequestNameReply;
 
 const {
   RELEASED,
   NON_EXISTENT,
-  NOT_OWNER,
+  NOT_OWNER
 } = dbus.ReleaseNameReply;
 
 const {
   ALLOW_REPLACEMENT,
   REPLACE_EXISTING,
-  DO_NOT_QUEUE,
+  DO_NOT_QUEUE
 } = dbus.NameFlag;
 
-let bus1 = dbus.sessionBus();
-let bus2 = dbus.sessionBus();
+const bus1 = dbus.sessionBus();
+const bus2 = dbus.sessionBus();
 
 bus1.on('error', (err) => {
   console.log(`bus1 got unexpected connection error:\n${err.stack}`);
@@ -34,7 +34,7 @@ bus2.on('error', (err) => {
 });
 
 beforeAll(async () => {
-  let connect = [bus1, bus2].map((bus) => {
+  const connect = [bus1, bus2].map((bus) => {
     return new Promise((resolve) => {
       bus.on('connect', resolve);
     });
@@ -48,8 +48,8 @@ afterAll(() => {
   bus2.disconnect();
 });
 
-async function getNameOwner(name) {
-  let reply = await bus1.call(new Message({
+async function getNameOwner (name) {
+  const reply = await bus1.call(new Message({
     destination: 'org.freedesktop.DBus',
     path: '/org/freedesktop/DBus',
     interface: 'org.freedesktop.DBus',
@@ -62,31 +62,31 @@ async function getNameOwner(name) {
 }
 
 test('name requests', async () => {
-  let testName = 'request.name.test';
+  const testName = 'request.name.test';
 
-  reply = await bus1.requestName(testName);
+  let reply = await bus1.requestName(testName);
   expect(reply).toEqual(PRIMARY_OWNER);
   reply = await bus1.requestName(testName);
   expect(reply).toEqual(ALREADY_OWNER);
 
-  reply = await bus2.requestName(testName, ALLOW_REPLACEMENT)
+  reply = await bus2.requestName(testName, ALLOW_REPLACEMENT);
   expect(reply).toEqual(IN_QUEUE);
 
-  reply = await bus1.releaseName(testName)
+  reply = await bus1.releaseName(testName);
   expect(reply).toEqual(RELEASED);
 
-  reply = await bus1.releaseName('name.doesnt.exist')
+  reply = await bus1.releaseName('name.doesnt.exist');
   expect(reply).toEqual(NON_EXISTENT);
 
-  reply = await bus1.releaseName(testName)
+  reply = await bus1.releaseName(testName);
   expect(reply).toEqual(NOT_OWNER);
 
-  new_owner = await getNameOwner(testName)
-  expect(new_owner).toEqual(bus2.name);
+  const newOwner = await getNameOwner(testName);
+  expect(newOwner).toEqual(bus2.name);
 
-  reply = await bus1.requestName(testName, DO_NOT_QUEUE)
+  reply = await bus1.requestName(testName, DO_NOT_QUEUE);
   expect(reply).toEqual(EXISTS);
 
-  reply = await bus1.requestName(testName, DO_NOT_QUEUE | REPLACE_EXISTING)
+  reply = await bus1.requestName(testName, DO_NOT_QUEUE | REPLACE_EXISTING);
   expect(reply).toEqual(PRIMARY_OWNER);
 });

@@ -1,12 +1,10 @@
 // Test that signals emit correctly
 
-let dbus = require('../../');
-let Variant = dbus.Variant;
-let DBusError = dbus.DBusError;
+const dbus = require('../../');
+const Variant = dbus.Variant;
 
-let {
-  Interface, property, method, signal,
-  ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
+const {
+  Interface, method, signal
 } = dbus.interface;
 
 const TEST_NAME = 'org.test.signals';
@@ -14,23 +12,23 @@ const TEST_NAME2 = 'org.test.signals_name2';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
-let bus = dbus.sessionBus();
+const bus = dbus.sessionBus();
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
-let bus2 = dbus.sessionBus();
+const bus2 = dbus.sessionBus();
 bus2.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
 class SignalsInterface extends Interface {
-  @signal({signature: 's'})
-  HelloWorld(value) {
+  @signal({ signature: 's' })
+  HelloWorld (value) {
     return value;
   }
 
-  @signal({signature: 'ss'})
-  SignalMultiple() {
+  @signal({ signature: 'ss' })
+  SignalMultiple () {
     return [
       'hello',
       'world'
@@ -41,38 +39,38 @@ class SignalsInterface extends Interface {
   complicated = new Variant('a{sv}', {
     foo: new Variant('s', 'bar'),
     bar: new Variant('d', 53),
-    bat: new Variant('v', new Variant('as', [ 'foo', 'bar', 'bat'])),
-    baz: new Variant('(doodoo)', [ 1, '/', '/', 1, '/', '/' ]),
+    bat: new Variant('v', new Variant('as', ['foo', 'bar', 'bat'])),
+    baz: new Variant('(doodoo)', [1, '/', '/', 1, '/', '/']),
     fiz: new Variant('(as(s(v)))', [
-      [ 'one', 'two' ],
+      ['one', 'two'],
       ['three', [
-        new Variant('as', [ 'four', 'five' ]) ]
+        new Variant('as', ['four', 'five'])]
       ]
     ]),
     buz: new Variant('av', [
       new Variant('as', ['foo']),
       new Variant('a{ss}', { foo: 'bar' }),
       new Variant('v', new Variant('(asas)', [['bar'], ['foo']])),
-      new Variant('v', new Variant('v', new Variant('as', [ 'one', 'two' ]))),
+      new Variant('v', new Variant('v', new Variant('as', ['one', 'two']))),
       new Variant('a{ss}', { foo: 'bar' })
     ])
   });
 
-  @signal({signature: 'v'})
-  SignalComplicated() {
+  @signal({ signature: 'v' })
+  SignalComplicated () {
     return this.complicated;
   }
 
-  @method({inSignature: '', outSignature: ''})
-  EmitSignals() {
+  @method({ inSignature: '', outSignature: '' })
+  EmitSignals () {
     this.HelloWorld('hello');
     this.SignalMultiple();
     this.SignalComplicated();
   }
 }
 
-let testIface = new SignalsInterface(TEST_IFACE);
-let testIface2 = new SignalsInterface(TEST_IFACE);
+const testIface = new SignalsInterface(TEST_IFACE);
+const testIface2 = new SignalsInterface(TEST_IFACE);
 
 beforeAll(async () => {
   await Promise.all([
@@ -89,13 +87,13 @@ afterAll(() => {
 });
 
 test('test that signals work correctly', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let test = object.getInterface(TEST_IFACE);
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const test = object.getInterface(TEST_IFACE);
 
-  let onHelloWorld = jest.fn();
-  let onSignalMultiple = jest.fn();
-  let onSignalMultiple2 = jest.fn();
-  let onSignalComplicated = jest.fn();
+  const onHelloWorld = jest.fn();
+  const onSignalMultiple = jest.fn();
+  const onSignalMultiple2 = jest.fn();
+  const onSignalComplicated = jest.fn();
 
   test.once('HelloWorld', onHelloWorld);
   test.on('SignalMultiple', onSignalMultiple);
@@ -116,7 +114,7 @@ test('test that signals work correctly', async () => {
   expect(bus._signals.eventNames().length).toEqual(2);
 
   // removing the listener on a signal should not remove them all
-  onSignalMultiple2.mockClear()
+  onSignalMultiple2.mockClear();
   await test.EmitSignals();
   expect(onSignalMultiple2).toHaveBeenCalledWith('hello', 'world');
 
@@ -134,14 +132,14 @@ test('signals dont get mixed up between names that define objects on the same pa
   // well known name, and the well known name is what will be different. For
   // this reason, I am going to recommend that people only use one name per bus
   // connection until we can figure that out.
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let object2 = await bus.getProxyObject(TEST_NAME2, TEST_PATH);
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const object2 = await bus.getProxyObject(TEST_NAME2, TEST_PATH);
 
-  let test = object.getInterface(TEST_IFACE);
-  let test2 = object2.getInterface(TEST_IFACE);
+  const test = object.getInterface(TEST_IFACE);
+  const test2 = object2.getInterface(TEST_IFACE);
 
-  let cb = jest.fn();
-  let cb2 = jest.fn();
+  const cb = jest.fn();
+  const cb2 = jest.fn();
 
   test.on('HelloWorld', cb);
   test.on('SignalMultiple', cb);

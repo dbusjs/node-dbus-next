@@ -4,53 +4,44 @@ const dbus = require('../../');
 const Variant = dbus.Variant;
 const DBusError = dbus.DBusError;
 
-let {
-  Interface, property, method, signal,
-  ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
+const {
+  Interface, property,
+  ACCESS_READ, ACCESS_WRITE
 } = dbus.interface;
 
 const TEST_NAME = 'org.test.properties';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 const USER_ERROR_IFACE = 'org.test.usererror';
-const INVALID_ARGS = 'org.freedesktop.DBus.Error.InvalidArgs'
 
-let bus = dbus.sessionBus();
+const bus = dbus.sessionBus();
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
 class UserErrorInterface extends Interface {
-  constructor(name) {
-    super(name);
+  @property({ signature: 's' })
+  get UserErrorProperty () {
+    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error');
   }
 
-  @property({signature: 's'})
-  get UserErrorProperty() {
-    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error')
-  }
-
-  set UserErrorProperty(what) {
-    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error')
+  set UserErrorProperty (what) {
+    throw new DBusError(`${TEST_IFACE}.UserError`, 'user error');
   }
 }
 
 class TestInterface extends Interface {
-  constructor(name) {
-    super(name);
-  }
-
-  @property({signature: 's'})
+  @property({ signature: 's' })
   SimpleProperty = 'foo';
 
-  @property({signature: 'v'})
+  @property({ signature: 'v' })
   VariantProperty = new Variant('s', 'foo');
 
-  @property({signature: '(a{sv}sv)'})
+  @property({ signature: '(a{sv}sv)' })
   ComplicatedProperty = [
     {
       foo: new Variant('s', 'bar'),
-      bar: new Variant('as', [ 'fiz', 'buz' ])
+      bar: new Variant('as', ['fiz', 'buz'])
     },
     'bat',
     new Variant('d', 53)
@@ -58,26 +49,27 @@ class TestInterface extends Interface {
 
   _NotifyingProperty = 'foo';
 
-  @property({signature: 's'})
-  get NotifyingProperty() {
+  @property({ signature: 's' })
+  get NotifyingProperty () {
     return this._NotifyingProperty;
   }
-  set NotifyingProperty(value) {
+
+  set NotifyingProperty (value) {
     this._NotifyingProperty = value;
     Interface.emitPropertiesChanged(this, {
       NotifyingProperty: value
     }, ['invalid']);
   }
 
-  @property({signature: 's', access: ACCESS_READ})
+  @property({ signature: 's', access: ACCESS_READ })
   ReadOnly = 'only read';
 
-  @property({signature: 's', access: ACCESS_WRITE})
+  @property({ signature: 's', access: ACCESS_WRITE })
   WriteOnly = 'only write';
 }
 
-let testIface = new TestInterface(TEST_IFACE);
-let userErrorIface = new UserErrorInterface(USER_ERROR_IFACE);
+const testIface = new TestInterface(TEST_IFACE);
+const userErrorIface = new UserErrorInterface(USER_ERROR_IFACE);
 
 beforeAll(async () => {
   await bus.requestName(TEST_NAME);
@@ -90,8 +82,8 @@ afterAll(() => {
 });
 
 test('the peer interface', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let peer = object.getInterface('org.freedesktop.DBus.Peer');
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const peer = object.getInterface('org.freedesktop.DBus.Peer');
   expect(peer).toBeDefined();
   expect(peer.Ping).toBeDefined();
   let req = peer.Ping();
@@ -101,11 +93,11 @@ test('the peer interface', async () => {
 });
 
 test('simple property get and set', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
 
-  let test = object.getInterface(TEST_IFACE);
+  const test = object.getInterface(TEST_IFACE);
   expect(test).toBeDefined();
-  let properties = object.getInterface('org.freedesktop.DBus.Properties');
+  const properties = object.getInterface('org.freedesktop.DBus.Properties');
   expect(properties).toBeDefined();
 
   // get and set a simple property
@@ -130,28 +122,28 @@ test('simple property get and set', async () => {
   await properties.Set(TEST_IFACE, 'VariantProperty', new Variant('v', new Variant('d', 53)));
   prop = await properties.Get(TEST_IFACE, 'VariantProperty');
   expect(prop).toBeInstanceOf(Variant);
-  expect(prop.value).toEqual(new Variant('d', 53))
+  expect(prop.value).toEqual(new Variant('d', 53));
   expect(prop.value).toEqual(testIface.VariantProperty);
 
   // test get all properties
-  let all = await properties.GetAll(TEST_IFACE);
+  const all = await properties.GetAll(TEST_IFACE);
   expect(all).toHaveProperty('SimpleProperty', new Variant('s', testIface.SimpleProperty));
   expect(all).toHaveProperty('VariantProperty', new Variant('v', testIface.VariantProperty));
 });
 
 test('complicated property get and set', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let properties = object.getInterface('org.freedesktop.DBus.Properties');
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const properties = object.getInterface('org.freedesktop.DBus.Properties');
   let prop = await properties.Get(TEST_IFACE, 'ComplicatedProperty');
   expect(prop).toBeInstanceOf(Variant);
   expect(prop.value).toEqual(testIface.ComplicatedProperty);
 
-  let updatedProp = [
+  const updatedProp = [
     {
       oof: new Variant('s', 'rab'),
-      rab: new Variant('as', [ 'zif', 'zub', 'zork' ]),
+      rab: new Variant('as', ['zif', 'zub', 'zork']),
       kevin: new Variant('a{sv}', {
-        'foo': new Variant('s', 'bar')
+        foo: new Variant('s', 'bar')
       })
     },
     'tab',
@@ -166,23 +158,23 @@ test('complicated property get and set', async () => {
 });
 
 test('properties changed signal', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let properties = object.getInterface('org.freedesktop.DBus.Properties');
-  let onPropertiesChanged = jest.fn((iface, changed, invalidated) => {
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const properties = object.getInterface('org.freedesktop.DBus.Properties');
+  const onPropertiesChanged = jest.fn((iface, changed, invalidated) => {
     // nop
   });
   properties.on('PropertiesChanged', onPropertiesChanged);
 
   await properties.Set(TEST_IFACE, 'NotifyingProperty', new Variant('s', 'bar'));
-  let e = {
+  const e = {
     NotifyingProperty: new Variant('s', 'bar')
   };
-  expect(onPropertiesChanged).toHaveBeenCalledWith(TEST_IFACE, e, [ 'invalid' ]);
+  expect(onPropertiesChanged).toHaveBeenCalledWith(TEST_IFACE, e, ['invalid']);
 });
 
 test('read and write access', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let properties = object.getInterface('org.freedesktop.DBus.Properties');
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const properties = object.getInterface('org.freedesktop.DBus.Properties');
 
   let req = properties.Get(TEST_IFACE, 'WriteOnly');
   await expect(req).rejects.toBeInstanceOf(DBusError);
@@ -192,8 +184,8 @@ test('read and write access', async () => {
 });
 
 test('properties interface specific errors', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let properties = object.getInterface('org.freedesktop.DBus.Properties');
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const properties = object.getInterface('org.freedesktop.DBus.Properties');
 
   let req = properties.Set('not.an.interface', 'ReadOnly', new Variant('s', 'foo'));
   await expect(req).rejects.toBeInstanceOf(DBusError);

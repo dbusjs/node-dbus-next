@@ -53,24 +53,31 @@
     "@babel/plugin-syntax-bigint": "^7.2.0",
     "@babel/plugin-transform-async-to-generator": "^7.3.4",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^24.8.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "commander": "^2.19.0",
     "handlebars": "^4.1.0",
     "jest": "^24.1.0",
-    "jsdoc": "^3.6.3"
+    "jsdoc": "^3.6.3",
+    "semistandard": "^14.2.3"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",
     "coverage": "dbus-run-session -- jest --coverage",
     "unit": "jest ./test/*.test.js",
     "test": "dbus-run-session -- jest",
-    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md -r lib index.js -d doc"
+    "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md -r lib index.js -d doc",
+    "format": "cd lib && semistandard --fix && cd ../test && semistandard --env jest --parser babel-eslint --global BigInt --fix"
   },
   "jest": {
     "testEnvironment": "node",
     "bail": true
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "globals": [ "BigInt" ]
   },
   "engine": {
     "node": ">=6.3.0"

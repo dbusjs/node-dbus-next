@@ -2,15 +2,14 @@
 
 const JSBI = require('jsbi');
 
-let dbus = require('../../');
+const dbus = require('../../');
 dbus.setBigIntCompat(true);
 
-let {
-  Interface, property, method, signal, DBusError,
-  ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
+const {
+  Interface, method, DBusError
 } = dbus.interface;
 
-let {
+const {
   MAX_INT64_STR, MIN_INT64_STR,
   MAX_UINT64_STR, MIN_UINT64_STR
 } = require('../../lib/constants');
@@ -25,22 +24,22 @@ const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 const TEST_ERROR_PATH = 'org.test.name.error';
 
-let bus = dbus.sessionBus();
+const bus = dbus.sessionBus();
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
 class LongInterface extends Interface {
-  @method({inSignature: 'x', outSignature: 'x'})
-  EchoSigned(what) {
+  @method({ inSignature: 'x', outSignature: 'x' })
+  EchoSigned (what) {
     if (what.prototype !== JSBI.BigInt.prototype) {
       throw new DBusError(TEST_ERROR_PATH, 'interface with long compat expected a JSBI BigInt for type x');
     }
     return what;
   }
 
-  @method({inSignature: 't', outSignature: 't'})
-  EchoUnsigned(what) {
+  @method({ inSignature: 't', outSignature: 't' })
+  EchoUnsigned (what) {
     if (what.prototype !== JSBI.BigInt.prototype) {
       throw new DBusError(TEST_ERROR_PATH, 'interface with long compat expected a JSBI BigInt for type t');
     }
@@ -48,7 +47,7 @@ class LongInterface extends Interface {
   }
 }
 
-let testIface = new LongInterface(TEST_IFACE);
+const testIface = new LongInterface(TEST_IFACE);
 
 beforeAll(async () => {
   await bus.requestName(TEST_NAME);
@@ -60,8 +59,8 @@ afterAll(() => {
 });
 
 test('test long type works correctly in compatibility mode', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let test = object.getInterface(TEST_IFACE);
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const test = object.getInterface(TEST_IFACE);
 
   // small numbers
   let what = JSBI.BigInt(-30);

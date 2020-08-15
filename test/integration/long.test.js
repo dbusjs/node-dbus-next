@@ -1,50 +1,45 @@
 // Test that methods and properties of type 'x' (long int) work correctly
 
+let testIfHasBigInt = test;
+
 if (typeof BigInt !== 'function') {
   // skip these tests if BigInt is not supported
-  BigInt = function(){};
-  test = test.skip;
+  testIfHasBigInt = test.skip;
 }
 
-let dbus = require('../../');
+const dbus = require('../../');
 
-let {
-  Interface, property, method, signal,
-  ACCESS_READ, ACCESS_WRITE, ACCESS_READWRITE
+const {
+  Interface, method
 } = dbus.interface;
 
-let {
+const {
   MAX_INT64_STR, MIN_INT64_STR,
   MAX_UINT64_STR, MIN_UINT64_STR
 } = require('../../lib/constants');
-
-const MAX_INT64 = BigInt(MAX_INT64_STR);
-const MIN_INT64 = BigInt(MIN_INT64_STR);
-const MAX_UINT64 = BigInt(MAX_UINT64_STR);
-const MIN_UINT64 = BigInt(MIN_UINT64_STR);
 
 const TEST_NAME = 'org.test.long';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
-let bus = dbus.sessionBus();
+const bus = dbus.sessionBus();
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
 class LongInterface extends Interface {
-  @method({inSignature: 'x', outSignature: 'x'})
-  EchoSigned(what) {
+  @method({ inSignature: 'x', outSignature: 'x' })
+  EchoSigned (what) {
     return what;
   }
 
-  @method({inSignature: 't', outSignature: 't'})
-  EchoUnsigned(what) {
+  @method({ inSignature: 't', outSignature: 't' })
+  EchoUnsigned (what) {
     return what;
   }
 }
 
-let testIface = new LongInterface(TEST_IFACE);
+const testIface = new LongInterface(TEST_IFACE);
 
 beforeAll(async () => {
   await bus.requestName(TEST_NAME);
@@ -55,9 +50,14 @@ afterAll(() => {
   bus.disconnect();
 });
 
-test('test long type works correctly', async () => {
-  let object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
-  let test = object.getInterface(TEST_IFACE);
+testIfHasBigInt('test long type works correctly', async () => {
+  const MAX_INT64 = BigInt(MAX_INT64_STR);
+  const MIN_INT64 = BigInt(MIN_INT64_STR);
+  const MAX_UINT64 = BigInt(MAX_UINT64_STR);
+  const MIN_UINT64 = BigInt(MIN_UINT64_STR);
+
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const test = object.getInterface(TEST_IFACE);
 
   // small numbers
   let what = BigInt(-30);

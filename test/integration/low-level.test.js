@@ -1,18 +1,18 @@
-let dbus = require('../../');
-let Message = dbus.Message;
-let {
+const dbus = require('../../');
+const Message = dbus.Message;
+const {
   METHOD_CALL,
   METHOD_RETURN,
   SIGNAL,
   ERROR
 } = dbus.MessageType;
 
-let {
+const {
   NO_REPLY_EXPECTED
 } = dbus.MessageFlag;
 
-let bus1 = dbus.sessionBus();
-let bus2 = dbus.sessionBus();
+const bus1 = dbus.sessionBus();
+const bus2 = dbus.sessionBus();
 
 bus1.on('error', (err) => {
   console.log(`bus1 got unexpected connection error:\n${err.stack}`);
@@ -22,7 +22,7 @@ bus2.on('error', (err) => {
 });
 
 beforeAll(async () => {
-  let connect = [bus1, bus2].map((bus) => {
+  const connect = [bus1, bus2].map((bus) => {
     return new Promise((resolve) => {
       bus.on('connect', resolve);
     });
@@ -37,14 +37,14 @@ afterAll(() => {
 });
 
 test('send a method call between buses', async () => {
-  let msg = new Message({
+  const msg = new Message({
     destination: bus1.name,
     path: '/org/test/path',
     interface: 'org.test.iface',
     member: 'SomeMember'
   });
 
-  let methodReturnHandler = function(sent) {
+  const methodReturnHandler = function (sent) {
     if (sent.serial === msg.serial) {
       expect(sent.path).toEqual(msg.path);
       expect(sent.serial).toEqual(msg.serial);
@@ -56,7 +56,7 @@ test('send a method call between buses', async () => {
       return true;
     }
     return false;
-  }
+  };
   bus1.addMethodHandler(methodReturnHandler);
   expect(bus1._methodHandlers.length).toEqual(1);
 
@@ -69,7 +69,7 @@ test('send a method call between buses', async () => {
   expect(reply.body).toEqual(['got it']);
   expect(reply.replySerial).toEqual(msg.serial);
 
-  let errorReturnHandler = function(sent) {
+  const errorReturnHandler = function (sent) {
     if (sent.serial === msg.serial) {
       expect(sent.type).toEqual(METHOD_CALL);
       expect(sent.path).toEqual(msg.path);
@@ -82,14 +82,14 @@ test('send a method call between buses', async () => {
       return true;
     }
     return false;
-  }
+  };
 
   bus1.addMethodHandler(errorReturnHandler);
   let error = null;
   try {
     // sending the same message twice should reset the serial
     await bus2.call(msg);
-  } catch(e) {
+  } catch (e) {
     error = e;
   }
 
@@ -106,7 +106,7 @@ test('send a method call between buses', async () => {
   expect(error.message).toEqual('throwing an error');
 
   // with no reply expected
-  let waitForMessage = new Promise((resolve) => {
+  const waitForMessage = new Promise((resolve) => {
     bus1.once('message', (msg) => {
       if (msg.sender === bus2.name) {
         resolve(msg);
@@ -115,14 +115,14 @@ test('send a method call between buses', async () => {
   });
 
   msg.flags = NO_REPLY_EXPECTED;
-  let result = await bus2.call(msg);
+  const result = await bus2.call(msg);
   expect(result).toBeNull();
   reply = await waitForMessage;
   expect(reply).toBeInstanceOf(Message);
 });
 
 test('send a signal between buses', async () => {
-  let addMatchMessage = new Message({
+  const addMatchMessage = new Message({
     destination: 'org.freedesktop.DBus',
     path: '/org/freedesktop/DBus',
     interface: 'org.freedesktop.DBus',
@@ -130,9 +130,9 @@ test('send a signal between buses', async () => {
     signature: 's',
     body: [`sender='${bus2.name}'`]
   });
-  await bus1.call(addMatchMessage)
+  await bus1.call(addMatchMessage);
 
-  let waitForMessage = new Promise((resolve) => {
+  const waitForMessage = new Promise((resolve) => {
     bus1.once('message', (msg) => {
       if (msg.sender === bus2.name) {
         resolve(msg);
@@ -141,7 +141,7 @@ test('send a signal between buses', async () => {
   });
 
   bus2.send(Message.newSignal('/org/test/path', 'org.test.interface', 'SomeSignal', 's', ['a signal']));
-  let signal = await waitForMessage;
+  const signal = await waitForMessage;
 
   expect(signal.type).toEqual(SIGNAL);
   expect(signal.path).toEqual('/org/test/path');
