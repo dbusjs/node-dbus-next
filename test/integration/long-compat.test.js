@@ -10,14 +10,8 @@ const {
 } = dbus.interface;
 
 const {
-  MAX_INT64_STR, MIN_INT64_STR,
-  MAX_UINT64_STR, MIN_UINT64_STR
+  _getJSBIConstants
 } = require('../../lib/constants');
-
-const MAX_INT64 = JSBI.BigInt(MAX_INT64_STR);
-const MIN_INT64 = JSBI.BigInt(MIN_INT64_STR);
-const MAX_UINT64 = JSBI.BigInt(MAX_UINT64_STR);
-const MIN_UINT64 = JSBI.BigInt(MIN_UINT64_STR);
 
 const TEST_NAME = 'org.test.long_compat';
 const TEST_PATH = '/org/test/path';
@@ -59,6 +53,7 @@ afterAll(() => {
 });
 
 test('test long type works correctly in compatibility mode', async () => {
+  const { MAX_INT64, MIN_INT64, MAX_UINT64, MIN_UINT64 } = _getJSBIConstants();
   const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   const test = object.getInterface(TEST_IFACE);
 
@@ -81,11 +76,21 @@ test('test long type works correctly in compatibility mode', async () => {
   expect(result.prototype).toEqual(JSBI.BigInt.prototype);
   expect(JSBI.equal(result, what)).toEqual(true);
 
+  expect((async () => {
+    result = await test.EchoSigned(JSBI.add(what, JSBI.BigInt(1)));
+    return result.toString();
+  })()).rejects.toThrow();
+
   // int64 min
   what = MIN_INT64;
   result = await test.EchoSigned(what);
   expect(result.prototype).toEqual(JSBI.BigInt.prototype);
   expect(JSBI.equal(result, what)).toEqual(true);
+
+  await expect((async () => {
+    result = await test.EchoSigned(JSBI.subtract(what, JSBI.BigInt(1)));
+    return result.toString();
+  })()).rejects.toThrow();
 
   // uint64 max
   what = MAX_UINT64;
@@ -93,9 +98,25 @@ test('test long type works correctly in compatibility mode', async () => {
   expect(result.prototype).toEqual(JSBI.BigInt.prototype);
   expect(JSBI.equal(result, what)).toEqual(true);
 
+  await expect((async () => {
+    result = await test.EchoUnsigned(JSBI.add(what, JSBI.BigInt(1)));
+    return result.toString();
+  })()).rejects.toThrow();
+
   // uint64 min
   what = MIN_UINT64;
   result = await test.EchoUnsigned(what);
   expect(result.prototype).toEqual(JSBI.BigInt.prototype);
   expect(JSBI.equal(result, what)).toEqual(true);
+
+  await expect((async () => {
+    result = await test.EchoUnsigned(JSBI.subtract(what, JSBI.BigInt(1)));
+    return result.toString();
+  })()).rejects.toThrow();
+
+  // int conversion
+  what = 500;
+  result = await test.EchoUnsigned(what);
+  expect(result.prototype).toEqual(JSBI.BigInt.prototype);
+  expect(JSBI.equal(result, JSBI.BigInt(what))).toEqual(true);
 });

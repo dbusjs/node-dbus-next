@@ -8,19 +8,20 @@ if (typeof BigInt !== 'function') {
 }
 
 const dbus = require('../../');
+const DBusError = dbus.DBusError;
 
 const {
   Interface, method
 } = dbus.interface;
 
 const {
-  MAX_INT64_STR, MIN_INT64_STR,
-  MAX_UINT64_STR, MIN_UINT64_STR
+  _getBigIntConstants
 } = require('../../lib/constants');
 
 const TEST_NAME = 'org.test.long';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
+const TEST_ERROR_PATH = 'org.test.name.error';
 
 const bus = dbus.sessionBus();
 bus.on('error', (err) => {
@@ -30,11 +31,17 @@ bus.on('error', (err) => {
 class LongInterface extends Interface {
   @method({ inSignature: 'x', outSignature: 'x' })
   EchoSigned (what) {
+    if (typeof what !== 'bigint') {
+      throw new DBusError(TEST_ERROR_PATH, 'interface with long expected a BigInt for type x');
+    }
     return what;
   }
 
   @method({ inSignature: 't', outSignature: 't' })
   EchoUnsigned (what) {
+    if (typeof what !== 'bigint') {
+      throw new DBusError(TEST_ERROR_PATH, 'interface with long expected a BigInt for type t');
+    }
     return what;
   }
 }
@@ -51,10 +58,7 @@ afterAll(() => {
 });
 
 testIfHasBigInt('test long type works correctly', async () => {
-  const MAX_INT64 = BigInt(MAX_INT64_STR);
-  const MIN_INT64 = BigInt(MIN_INT64_STR);
-  const MAX_UINT64 = BigInt(MAX_UINT64_STR);
-  const MIN_UINT64 = BigInt(MIN_UINT64_STR);
+  const { MAX_INT64, MIN_INT64, MAX_UINT64, MIN_UINT64 } = _getBigIntConstants();
 
   const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
   const test = object.getInterface(TEST_IFACE);
@@ -76,18 +80,34 @@ testIfHasBigInt('test long type works correctly', async () => {
   result = await test.EchoSigned(what);
   expect(result === what).toEqual(true);
 
+  expect((async () => {
+    return await test.EchoSigned(what + 1n);
+  })()).rejects.toThrow();
+
   // int64 min
   what = MIN_INT64;
   result = await test.EchoSigned(what);
   expect(result === what).toEqual(true);
+
+  expect((async () => {
+    return await test.EchoSigned(what - 1n);
+  })()).rejects.toThrow();
 
   // uint64 max
   what = MAX_UINT64;
   result = await test.EchoUnsigned(what);
   expect(result === what).toEqual(true);
 
+  expect((async () => {
+    return await test.EchoUnsigned(what + 1n);
+  })()).rejects.toThrow();
+
   // uint64 min
   what = MIN_UINT64;
   result = await test.EchoUnsigned(what);
   expect(result === what).toEqual(true);
+
+  expect((async () => {
+    return await test.EchoUnsigned(what - 1n);
+  })()).rejects.toThrow();
 });

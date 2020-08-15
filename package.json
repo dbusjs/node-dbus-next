@@ -69,7 +69,7 @@
     "unit": "jest ./test/*.test.js",
     "test": "dbus-run-session -- jest",
     "doc": "jsdoc --verbose -c jsdoc.conf --readme README.md -r lib index.js -d doc",
-    "format": "cd lib && semistandard --fix && cd ../test && semistandard --env jest --parser babel-eslint --global BigInt --fix"
+    "format": "cd lib && semistandard --global BigInt --fix && cd ../test && semistandard --env jest --parser babel-eslint --global BigInt --fix"
   },
   "jest": {
     "testEnvironment": "node",
