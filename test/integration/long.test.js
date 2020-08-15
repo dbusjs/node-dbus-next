@@ -81,7 +81,7 @@ testIfHasBigInt('test long type works correctly', async () => {
   expect(result === what).toEqual(true);
 
   expect((async () => {
-    return await test.EchoSigned(what + 1n);
+    return await test.EchoSigned(what + BigInt(1));
   })()).rejects.toThrow();
 
   // int64 min
@@ -90,7 +90,7 @@ testIfHasBigInt('test long type works correctly', async () => {
   expect(result === what).toEqual(true);
 
   expect((async () => {
-    return await test.EchoSigned(what - 1n);
+    return await test.EchoSigned(what - BigInt(1));
   })()).rejects.toThrow();
 
   // uint64 max
@@ -99,7 +99,7 @@ testIfHasBigInt('test long type works correctly', async () => {
   expect(result === what).toEqual(true);
 
   expect((async () => {
-    return await test.EchoUnsigned(what + 1n);
+    return await test.EchoUnsigned(what + BigInt(1));
   })()).rejects.toThrow();
 
   // uint64 min
@@ -108,6 +108,6 @@ testIfHasBigInt('test long type works correctly', async () => {
   expect(result === what).toEqual(true);
 
   expect((async () => {
-    return await test.EchoUnsigned(what - 1n);
+    return await test.EchoUnsigned(what - BigInt(1));
   })()).rejects.toThrow();
 });
