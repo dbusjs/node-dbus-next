@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.1
+
+This release includes some bug fixes, new features, and a semi-breaking change.
+
+* (semi-breaking) Make type `ay` a buffer. This is different from previous behavior, but it is in line with the documentation from the beginning of the project. (#57)
+* service: Add support for no reply methods (#50)
+* fix syntax for tcp addresses (#51)
+* Add typescript bindings for bus events (#58)
+* bug: property getter executed when using `configureMembers` (#60)
+* Improve code generators (#52)
+* Avoid JSBI code paths when BigInt compatibility mode is not on (this should help a bit in webpack environments) (f1e2b4a)
+
 ## v0.8.2
 
 This release includes some bug fixes.
