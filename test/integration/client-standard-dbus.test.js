@@ -2,7 +2,11 @@
 // correctly
 
 const dbus = require('../../');
+const Message = dbus.Message;
 const bus = dbus.sessionBus();
+const {Interface} = dbus.interface;
+const xml2js = require('xml2js');
+
 bus.on('error', (err) => {
   console.log(`got unexpected connection error:\n${err.stack}`);
 });
@@ -72,4 +76,65 @@ test('provided xml', async () => {
   expect(iface.Bazify).toBeDefined();
   expect(iface.Mogrify).toBeDefined();
   expect(iface.$signals.find((s) => s.name === 'Changed')).toBeDefined();
+});
+
+class Iface extends Interface {
+  constructor() {
+    super('org.test.Interface1');
+  }
+}
+
+test('exported service introspection', async () => {
+  // regression: see #62
+
+  const iface1 = new Iface();
+  const iface2 = new Iface();
+
+  const dest = 'org.test.services';
+
+  bus.export('/org/test/path1', iface1);
+  bus.export('/org/test/path2', iface2);
+
+  await bus.requestName(dest);
+
+  const parser = new xml2js.Parser();
+
+  const introspect = async (path) => {
+    const msg = new Message({
+      destination: dest,
+      path: path,
+      interface: 'org.freedesktop.DBus.Introspectable',
+      member: 'Introspect',
+    });
+
+    let result = await bus.call(msg);
+    let error, xml;
+
+    parser.parseString(result.body[0], (e, data) => {
+      if (e) {
+        error = e;
+        return;
+      }
+      xml = data;
+    });
+
+    expect(error).toBeUndefined();
+
+    return xml;
+  };
+
+  const validateIntrospection = (introspection, nodeCount) => {
+  expect(introspection.node).toBeDefined();
+  expect(introspection.node.node).toBeDefined();
+  expect(introspection.node.node.length).toBe(nodeCount);
+  };
+
+  let introspection = await introspect('/');
+  validateIntrospection(introspection, 1);
+
+  introspection = await introspect('/org');
+  validateIntrospection(introspection, 1);
+
+  introspection = await introspect('/org/test');
+  validateIntrospection(introspection, 2);
 });
