@@ -154,3 +154,39 @@ test('signals dont get mixed up between names that define objects on the same pa
   expect(cb).toHaveBeenCalledTimes(3);
   expect(cb2).toHaveBeenCalledTimes(0);
 });
+
+test('regression #64: adding multiple listeners to a signal', async () => {
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH);
+  const test = object.getInterface(TEST_IFACE);
+
+  const cb = jest.fn();
+  const cb2 = jest.fn();
+  const cb3 = jest.fn();
+
+  test.on('HelloWorld', cb);
+  test.on('HelloWorld', cb2);
+  test.on('HelloWorld', cb3);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(1);
+  expect(cb2).toHaveBeenCalledTimes(1);
+  expect(cb3).toHaveBeenCalledTimes(1);
+
+  test.removeListener('HelloWorld', cb);
+  test.removeListener('HelloWorld', cb2);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(1);
+  expect(cb2).toHaveBeenCalledTimes(1);
+  expect(cb3).toHaveBeenCalledTimes(2);
+
+  test.removeListener('HelloWorld', cb3);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(1);
+  expect(cb2).toHaveBeenCalledTimes(1);
+  expect(cb3).toHaveBeenCalledTimes(2);
+})
