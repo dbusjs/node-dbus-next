@@ -44,7 +44,8 @@
     "xml2js": "^0.4.17"
   },
   "optionalDependencies": {
-    "abstract-socket": "^2.0.0"
+    "abstract-socket": "^2.0.0",
+    "usocket": "^0.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
