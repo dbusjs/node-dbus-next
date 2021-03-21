@@ -2,7 +2,7 @@ language: node_js
 sudo: required
 dist: bionic
 node_js:
-  - 6.3.0
+  - 6.17.0
   - node
 before_install:
   - sudo apt install -y dbus
