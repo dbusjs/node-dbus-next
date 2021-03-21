@@ -4,7 +4,7 @@
 const dbus = require('../../');
 const Message = dbus.Message;
 const bus = dbus.sessionBus();
-const {Interface} = dbus.interface;
+const { Interface } = dbus.interface;
 const xml2js = require('xml2js');
 
 bus.on('error', (err) => {
@@ -79,7 +79,7 @@ test('provided xml', async () => {
 });
 
 class Iface extends Interface {
-  constructor() {
+  constructor () {
     super('org.test.Interface1');
   }
 }
@@ -104,10 +104,10 @@ test('exported service introspection', async () => {
       destination: dest,
       path: path,
       interface: 'org.freedesktop.DBus.Introspectable',
-      member: 'Introspect',
+      member: 'Introspect'
     });
 
-    let result = await bus.call(msg);
+    const result = await bus.call(msg);
     let error, xml;
 
     parser.parseString(result.body[0], (e, data) => {
@@ -124,9 +124,9 @@ test('exported service introspection', async () => {
   };
 
   const validateIntrospection = (introspection, nodeCount) => {
-  expect(introspection.node).toBeDefined();
-  expect(introspection.node.node).toBeDefined();
-  expect(introspection.node.node.length).toBe(nodeCount);
+    expect(introspection.node).toBeDefined();
+    expect(introspection.node.node).toBeDefined();
+    expect(introspection.node.node.length).toBe(nodeCount);
   };
 
   let introspection = await introspect('/');

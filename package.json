@@ -61,7 +61,7 @@
     "handlebars": "^4.1.0",
     "jest": "^26.6.3",
     "jsdoc": "^3.6.3",
-    "semistandard": "^14.2.3"
+    "semistandard": "^16.0.0"
   },
   "scripts": {
     "integration": "dbus-run-session -- jest ./test/integration",

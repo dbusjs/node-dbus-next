@@ -189,4 +189,4 @@ test('regression #64: adding multiple listeners to a signal', async () => {
   expect(cb).toHaveBeenCalledTimes(1);
   expect(cb2).toHaveBeenCalledTimes(1);
   expect(cb3).toHaveBeenCalledTimes(2);
-})
+});
