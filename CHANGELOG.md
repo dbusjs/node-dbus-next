@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.2
+
+This release includes two bugfixes.
+
+* service: Fix duplicate paths in xml introspection (#62)
+* client: Fix a bug where signal handlers were run multiple times (#64)
+
 ## v0.9.1
 
 This release includes some bug fixes, new features, and a semi-breaking change.
