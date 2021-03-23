@@ -2,7 +2,6 @@
 
 const dbus = require('../../');
 const fs = require("fs");
-const { promisify } = require("util");
 const Variant = dbus.Variant;
 const DBusError = dbus.DBusError;
 
@@ -33,10 +32,30 @@ bus2.on('error', (err) => {
     console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
-
-const openFd = promisify(fs.open).bind(null, "/dev/null", "r");
-const closeFd = promisify(fs.close);
-const fstat = promisify(fs.fstat);
+function openFd() {
+    return new Promise((resolve, reject) => {
+        fs.open("/dev/null", "r", (err, fd) => {
+            if(err) reject(err);
+            else resolve(fd);
+        })
+    })
+}
+function closeFd(fd) {
+    return new Promise((resolve, reject) => {
+        fs.close(fd, (err) => {
+            if(err) reject(err);
+            else resolve();
+        })
+    })
+}
+function fstat(fd) {
+    return new Promise((resolve, reject) => {
+        fs.fstat(fd, (err, res) => {
+            if(err) reject(err);
+            else resolve(res);
+        })
+    })
+}
 async function compareFd(fd1, fd2) {
     if(!fd1 || !fd2) return;
     expect(fd1).toBeDefined();
