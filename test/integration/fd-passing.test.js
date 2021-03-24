@@ -4,12 +4,24 @@ const dbus = require('../../');
 const fs = require("fs");
 const Variant = dbus.Variant;
 const DBusError = dbus.DBusError;
+const Message = dbus.Message;
 
 const {
     Interface, property,
     method, signal,
     ACCESS_READ, ACCESS_WRITE
 } = dbus.interface;
+
+const {
+    METHOD_CALL,
+    METHOD_RETURN,
+    SIGNAL,
+    ERROR
+} = dbus.MessageType;
+
+const {
+    NO_REPLY_EXPECTED
+} = dbus.MessageFlag;
 
 const TEST_NAME = 'org.test.filedescriptors';
 const TEST_PATH = '/org/test/path';
@@ -21,7 +33,7 @@ bus.on('error', (err) => {
 });
 
 // make sure unix fds are supported by the bus
-if(!bus._connection.stream.supportsUnixFd) {
+if (!bus._connection.stream.supportsUnixFd) {
     console.log("UNIX_FD not supported");
     test = test.skip
 }
@@ -34,7 +46,7 @@ bus2.on('error', (err) => {
 function openFd() {
     return new Promise((resolve, reject) => {
         fs.open("/dev/null", "r", (err, fd) => {
-            if(err) reject(err);
+            if (err) reject(err);
             else resolve(fd);
         })
     })
@@ -42,7 +54,7 @@ function openFd() {
 function closeFd(fd) {
     return new Promise((resolve, reject) => {
         fs.close(fd, (err) => {
-            if(err) reject(err);
+            if (err) reject(err);
             else resolve();
         })
     })
@@ -50,13 +62,12 @@ function closeFd(fd) {
 function fstat(fd) {
     return new Promise((resolve, reject) => {
         fs.fstat(fd, (err, res) => {
-            if(err) reject(err);
+            if (err) reject(err);
             else resolve(res);
         })
     })
 }
 async function compareFd(fd1, fd2) {
-    if(!fd1 || !fd2) return;
     expect(fd1).toBeDefined();
     expect(fd2).toBeDefined();
     const s1 = await fstat(fd1);
@@ -87,17 +98,17 @@ class TestInterface extends Interface {
     }
 
     @property({ signature: 'h', access: ACCESS_READ })
-    get getFdProp () {
-      return this.getLastFd();
+    get getFdProp() {
+        return this.getLastFd();
     }
 
     @property({ signature: 'h', access: ACCESS_WRITE })
-    set setFdProp (fd) {
-      this.fds.push(fd);
+    set setFdProp(fd) {
+        this.fds.push(fd);
     }
 
     @signal({ signature: 'h' })
-    signalFd (fd) {
+    signalFd(fd) {
         return fd;
     }
 
@@ -200,7 +211,7 @@ test('signal file descriptor', async () => {
     expect(test).toBeDefined();
 
     let fd;
-    const onSignal = jest.fn((fd_) => fd=fd_);
+    const onSignal = jest.fn((fd_) => fd = fd_);
     test.on("signalFd", onSignal);
 
     await test.emitSignal();
@@ -209,4 +220,88 @@ test('signal file descriptor', async () => {
 
     await compareFd(fd, testIface.getLastFd());
     await closeFd(fd);
+});
+
+
+test('low level file descriptor sending', async () => {
+    const fd = await openFd();
+    const msg = new Message({
+        destination: bus.name,
+        path: '/org/test/path',
+        interface: 'org.test.iface',
+        member: 'SomeMember',
+        signature: 'h',
+        body: [fd],
+    });
+
+    const methodReturnHandler = function (sent) {
+        if (sent.serial === msg.serial) {
+            expect(sent.path).toEqual(msg.path);
+            expect(sent.serial).toEqual(msg.serial);
+            expect(sent.interface).toEqual(msg.interface);
+            expect(sent.member).toEqual(msg.member);
+            expect(sent.signature).toEqual("h");
+            const sentFd = sent.body[0];
+            compareFd(sentFd, fd).then(() => {
+                return closeFd(sentFd);
+            }).then(() => {
+                bus.send(Message.newMethodReturn(sent, 's', ['got it']));
+            });
+
+            bus.removeMethodHandler(methodReturnHandler);
+            return true;
+        }
+        return false;
+    };
+    bus.addMethodHandler(methodReturnHandler);
+    expect(bus._methodHandlers.length).toEqual(1);
+
+    let reply = await bus2.call(msg);
+
+    expect(bus._methodHandlers.length).toEqual(0);
+    expect(reply.type).toEqual(METHOD_RETURN);
+    expect(reply.sender).toEqual(bus.name);
+    expect(reply.signature).toEqual('s');
+    expect(reply.body).toEqual(['got it']);
+    expect(reply.replySerial).toEqual(msg.serial);
+
+    await closeFd(fd);
+});
+
+
+test('low level file descriptor receiving', async () => {
+    const fd = await openFd();
+    const msg = new Message({
+        destination: bus.name,
+        path: '/org/test/path',
+        interface: 'org.test.iface',
+        member: 'SomeMember',
+    });
+
+    const methodReturnHandler = function (sent) {
+        if (sent.serial === msg.serial) {
+            expect(sent.path).toEqual(msg.path);
+            expect(sent.serial).toEqual(msg.serial);
+            expect(sent.interface).toEqual(msg.interface);
+            expect(sent.member).toEqual(msg.member);
+            bus.send(Message.newMethodReturn(sent, 'h', [fd]));
+            bus.removeMethodHandler(methodReturnHandler);
+            return true;
+        }
+        return false;
+    };
+    bus.addMethodHandler(methodReturnHandler);
+    expect(bus._methodHandlers.length).toEqual(1);
+
+    let reply = await bus2.call(msg);
+
+    expect(bus._methodHandlers.length).toEqual(0);
+    expect(reply.type).toEqual(METHOD_RETURN);
+    expect(reply.sender).toEqual(bus.name);
+    expect(reply.signature).toEqual('h');
+    expect(reply.replySerial).toEqual(msg.serial);
+    await compareFd(fd, reply.body[0]);
+
+    await closeFd(fd);
+    await closeFd(reply.body[0]);
 });
