@@ -20,8 +20,7 @@ bus.on('error', (err) => {
     console.log(`got unexpected connection error:\n${err.stack}`);
 });
 
-// if the test session was launched with dbus-run-session 
-// it will be an abstract socket which does not support unix fds
+// make sure unix fds are supported by the bus
 if(!bus._connection.stream.supportsUnixFd) {
     console.log("UNIX_FD not supported");
     test = test.skip
