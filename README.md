@@ -232,10 +232,15 @@ Each code in the signature is mapped to a JavaScript type as shown in the table 
 | STRING      | s    | string  |                                                                    |
 | OBJECT_PATH | o    | string  | Must be a valid object path                                        |
 | SIGNATURE   | g    | string  | Must be a valid signature                                          |
+| UNIX_FD     | h    | number  | Must be a valid unix file descriptor. e.g. from `fs.open()`        |
 | ARRAY       | a    | Array   | Must be followed by a complete type which specifies the child type |
 | STRUCT      | (    | Array   | Types in the JS Array must match the types between the parens      |
 | VARIANT     | v    | Variant | This class is provided by the library.                             |
 | DICT_ENTRY  | {    | Object  | Must be included in an array type to be an object.                 |
+
+Unix file descriptors are only supported on abstract or domain (path) sockets. This is the default for both system and session bus.
+When sending a file descriptor it must be kept open until the message is delivered.
+When receiving a file descriptor the application is responsible for closing it.
 
 The types `a`, `(`, `v`, and `{` are container types that hold other values. Examples of container types and JavaScript examples are in the table below.
 
