@@ -1,8 +1,9 @@
-language: node_js
+language: minimal
 sudo: required
-dist: bionic
-node_js:
-  - 6.17.0
-  - node
+dist: focal
+services:
+  - docker
 before_install:
-  - sudo apt install -y dbus
+  - docker build -t node-dbus-next-test .
+script:
+  - docker run -it node-dbus-next-test
