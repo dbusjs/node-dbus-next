@@ -42,6 +42,16 @@ module.exports.sessionBus = function(opts) {
 };
 
 /**
+ * Create a new {@link MessageBus} client to communicate peer-to-peer.
+ *
+ * @param {object} [stream] - Duplex stream for communication.
+ * @param {object} [options] - Options for `MessageBus` creation.
+ */
+module.exports.peerBus = function(stream, opts) {
+  return createClient(Object.assign({}, opts, { stream }));
+};
+
+/**
  * Use JSBI as a polyfill for long integer types ('x' and 't') in the client
  * and the service. This is required for Node verisons that do not support the
  * native `BigInt` class which is used by default for these types (version <
