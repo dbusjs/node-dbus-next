@@ -34,6 +34,7 @@ declare module 'dbus-next' {
             outSignature?: string;
             name?: string;
             disabled?: boolean;
+            noReply?: boolean;
         }
         export interface SignalOptions {
             signature: string;
