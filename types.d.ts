@@ -122,8 +122,8 @@ declare module 'dbus-next' {
         bus: MessageBus;
         readonly name: string;
         readonly path: ObjectPath;
-        readonly nodes: ObjectPath[];
-        readonly interfaces: { [name: string]: ClientInterface };
+        nodes: ObjectPath[];
+        interfaces: { [name: string]: ClientInterface };
 
         getInterface(name: string): ClientInterface;
         getInterface<T extends ClientInterface>(name: string): T;
