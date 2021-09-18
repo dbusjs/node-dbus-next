@@ -11,6 +11,56 @@ const TEST_NAME = 'org.test.signals';
 const TEST_NAME2 = 'org.test.signals_name2';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
+const TEST_XML = `
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.freedesktop.DBus.Introspectable">
+    <method name="Introspect">
+      <arg name="data" direction="out" type="s"/>
+    </method>
+  </interface>
+  <interface name="org.freedesktop.DBus.Peer">
+    <method name="GetMachineId">
+      <arg direction="out" name="machine_uuid" type="s"/>
+    </method>
+    <method name="Ping"/>
+  </interface>
+  <interface name="org.freedesktop.DBus.Properties">
+    <method name="Get">
+      <arg direction="in" type="s"/>
+      <arg direction="in" type="s"/>
+      <arg direction="out" type="v"/>
+    </method>
+    <method name="Set">
+      <arg direction="in" type="s"/>
+      <arg direction="in" type="s"/>
+      <arg direction="in" type="v"/>
+    </method>
+    <method name="GetAll">
+      <arg direction="in" type="s"/>
+      <arg direction="out" type="a{sv}"/>
+    </method>
+    <signal name="PropertiesChanged">
+      <arg type="s"/>
+      <arg type="a{sv}"/>
+      <arg type="as"/>
+    </signal>
+  </interface>
+  <interface name="org.test.iface">
+    <method name="EmitSignals"/>
+    <signal name="HelloWorld">
+      <arg type="s"/>
+    </signal>
+    <signal name="SignalMultiple">
+      <arg type="s"/>
+      <arg type="s"/>
+    </signal>
+    <signal name="SignalComplicated">
+      <arg type="v"/>
+    </signal>
+  </interface>
+</node>
+`;
 
 const bus = dbus.sessionBus();
 bus.on('error', (err) => {
@@ -189,4 +239,26 @@ test('regression #64: adding multiple listeners to a signal', async () => {
   expect(cb).toHaveBeenCalledTimes(1);
   expect(cb2).toHaveBeenCalledTimes(1);
   expect(cb3).toHaveBeenCalledTimes(2);
+});
+
+test('bug #XXX: signals dont get lost when no previous method calls have been made', async () => {
+  // clear the name owners cache from previous tests
+  bus._nameOwners = {};
+
+  // when providing XML data, no introspection call is made
+  const object = await bus.getProxyObject(TEST_NAME, TEST_PATH, TEST_XML);
+  const test = object.getInterface(TEST_IFACE);
+  const cb = jest.fn();
+
+  test.on('HelloWorld', cb);
+  test.on('SignalMultiple', cb);
+  test.on('SignalComplicated', cb);
+
+  // don't call EmitSignals through the proxy object
+  testIface.EmitSignals();
+
+  // allow signal handlers to run
+  await new Promise(resolve => { setTimeout(resolve, 0); });
+
+  expect(cb).toHaveBeenCalledTimes(3);
 });
