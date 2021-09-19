@@ -27,7 +27,7 @@ const TEST_NAME = 'org.test.filedescriptors';
 const TEST_PATH = '/org/test/path';
 const TEST_IFACE = 'org.test.iface';
 
-const bus = dbus.sessionBus();
+const bus = dbus.sessionBus({negotiateUnixFd: true});
 bus.on('error', (err) => {
     console.log(`got unexpected connection error:\n${err.stack}`);
 });
@@ -38,7 +38,7 @@ if (!bus._connection.stream.supportsUnixFd) {
     test = test.skip
 }
 
-const bus2 = dbus.sessionBus();
+const bus2 = dbus.sessionBus({negotiateUnixFd: true});
 bus2.on('error', (err) => {
     console.log(`got unexpected connection error:\n${err.stack}`);
 });

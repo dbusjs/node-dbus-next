@@ -255,6 +255,10 @@ The types `a`, `(`, `v`, and `{` are container types that hold other values. Exa
 
 For more information on the DBus type system, see [the specification](https://dbus.freedesktop.org/doc/dbus-specification.html#type-system).
 
+### Negotiating Unix File Descriptors
+
+To support negotiating Unix file descriptors (DBus type `h`), set `negotiateUnixFd` to `true` in the message bus constructor options. The value of any type `h` in messages sent or received should be the file descriptor itself. You are responsible for closing any file descriptor sent or received by the bus.
+
 ## Contributing
 
 Contributions are welcome. Development happens on [Github](https://github.com/dbusjs/node-dbus-next).
