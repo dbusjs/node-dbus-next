@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.10.1
+
+This release includes bugfixes and new features.
+
+* Support negotiating Unix FDs (#67, #89)
+* Add noReply to MethodOptions interface in Type Definitions (#70)
+* Fix compatibility with buffer@4 (#71)
+* Init signals on ProxyObject creation (#86)
+
 ## v0.9.2
 
 This release includes two bugfixes.
