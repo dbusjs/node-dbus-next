@@ -17,9 +17,12 @@ let createClient = function(params) {
  * `DBUS_SYSTEM_BUS_ADDRESS` environment variable or
  * `unix:path=/var/run/dbus/system_bus_socket`.
  *
+ * @param {object} [options] - Options for `MessageBus` creation.
+ * @param {object} [options.negotiateUnixFd] - Whether this bus should support the negotiation of Unix file descriptors.
  */
-module.exports.systemBus = function() {
+module.exports.systemBus = function(opts) {
   return createClient({
+    negotiateUnixFd: opts.negotiateUnixFd,
     busAddress:
       process.env.DBUS_SYSTEM_BUS_ADDRESS ||
       'unix:path=/var/run/dbus/system_bus_socket'
@@ -32,6 +35,7 @@ module.exports.systemBus = function() {
  *
  * @param {object} [options] - Options for `MessageBus` creation.
  * @param {object} [options.busAddress] - The socket path for the session bus.
+ * @param {object} [options.negotiateUnixFd] - Whether this bus should support the negotiation of Unix file descriptors.
  * Defaults to finding the bus address in the manner specified in the DBus
  * specification. The bus address will first be read from the
  * `DBUS_SESSION_BUS_ADDRESS` environment variable and when that is not
