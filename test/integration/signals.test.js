@@ -241,7 +241,7 @@ test('regression #64: adding multiple listeners to a signal', async () => {
   expect(cb3).toHaveBeenCalledTimes(2);
 });
 
-test('bug #XXX: signals dont get lost when no previous method calls have been made', async () => {
+test('bug #86: signals dont get lost when no previous method calls have been made', async () => {
   // clear the name owners cache from previous tests
   bus._nameOwners = {};
 
