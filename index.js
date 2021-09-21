@@ -21,6 +21,8 @@ let createClient = function(params) {
  * @param {object} [options.negotiateUnixFd] - Whether this bus should support the negotiation of Unix file descriptors.
  */
 module.exports.systemBus = function(opts) {
+  if(!opts)
+    opts = {};
   return createClient({
     negotiateUnixFd: opts.negotiateUnixFd,
     busAddress:
