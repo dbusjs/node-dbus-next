@@ -98,6 +98,19 @@ declare module 'dbus-next' {
         static newSignal(path: string, iface: string, name: string, signature?: string, body?: any[]): Message;
     }
 
+    export class NameFlag {
+        static ALLOW_REPLACEMENT: number;
+        static REPLACE_EXISTING: number;
+        static DO_NOT_QUEUE: number;
+    }
+
+    export class RequestNameReply {
+        static PRIMARY_OWNER: number;
+        static IN_QUEUE: number;
+        static EXISTS: number;
+        static ALREADY_OWNER: number;
+    }
+
     export class MessageBus extends EventEmitter {
         getProxyObject(name: string, path: string, xml?: string): Promise<ProxyObject>;
         disconnect(): void;
