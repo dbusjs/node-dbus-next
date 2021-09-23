@@ -100,8 +100,8 @@ declare module 'dbus-next' {
 
     export class NameFlag {
         static ALLOW_REPLACEMENT: number;
-        static REPLACE_EXISTING: number
-        static DO_NOT_QUEUE: number
+        static REPLACE_EXISTING: number;
+        static DO_NOT_QUEUE: number;
     }
 
     export class RequestNameReply {
