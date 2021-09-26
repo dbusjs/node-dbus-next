@@ -134,12 +134,16 @@ declare module 'dbus-next' {
 
     export type AuthMethod = 'EXTERNAL' | 'DBUS_COOKIE_SHA1' | 'ANONYMOUS';
 
-    export interface BusOptions {
+    export interface SystemBusOptions {
+        negotiateUnixFd?: boolean;
+    }
+
+    export interface SessionBusOptions {
         authMethods?: AuthMethod[];
         busAddress?: string;
     }
 
     export function setBigIntCompat(state: boolean): void;
-    export function systemBus(): MessageBus;
-    export function sessionBus(options?: BusOptions): MessageBus;
+    export function systemBus(options?: SystemBusOptions): MessageBus;
+    export function sessionBus(options?: SessionBusOptions): MessageBus;
 }
