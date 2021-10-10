@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.10.2
+
+This is a hotfix release for a bug in the system message bus.
+
+* Add default parameters object to system message bus constructor (#90)
+* Add missing flags to TypeScript definitions (#91)
+* Add parameters object to system bus TypeScript definitions (#92)
+
 ## v0.10.1
 
 This release includes bugfixes and new features.
