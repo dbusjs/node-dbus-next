@@ -7,16 +7,12 @@ const MPRIS_PATH = '/org/mpris/MediaPlayer2';
 const PROPERTIES_IFACE = 'org.freedesktop.DBus.Properties';
 
 async function listAll() {
-  let result = [];
   let bus = dbus.sessionBus();
   let obj = await bus.getProxyObject('org.freedesktop.DBus', '/org/freedesktop/DBus');
   let iface = obj.getInterface('org.freedesktop.DBus');
   let names = await iface.ListNames();
-  for (let n of names) {
-    if (n.startsWith('org.mpris.MediaPlayer2.')) {
-      result.push(n);
-    }
-  }
+  let result = names.filter((n) => n.startsWith('org.mpris.MediaPlayer2'))
+  
   return result;
 }
 
