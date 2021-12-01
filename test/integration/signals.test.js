@@ -1,6 +1,8 @@
 // Test that signals emit correctly
 
 const dbus = require('../../');
+const { waitForMessage } = require('../util');
+
 const Variant = dbus.Variant;
 
 const {
@@ -121,6 +123,16 @@ class SignalsInterface extends Interface {
 
 const testIface = new SignalsInterface(TEST_IFACE);
 const testIface2 = new SignalsInterface(TEST_IFACE);
+
+async function createTestService(name) {
+  const testBus = dbus.sessionBus();
+  const testIface = new SignalsInterface(TEST_IFACE);
+
+  await testBus.requestName(name);
+  testBus.export(TEST_PATH, testIface);
+
+  return [testBus, testIface];
+}
 
 beforeAll(async () => {
   await Promise.all([
@@ -261,4 +273,43 @@ test('bug #86: signals dont get lost when no previous method calls have been mad
   await new Promise(resolve => { setTimeout(resolve, 0); });
 
   expect(cb).toHaveBeenCalledTimes(3);
+});
+
+test('client continues receive signals from restarted DBus service', async () => {
+  const clientBus = dbus.sessionBus();
+
+  const testServiceName = 'local.test.signals';
+  let [testBus] = await createTestService(testServiceName);
+
+  const object = await clientBus.getProxyObject(testServiceName, TEST_PATH);
+  const test = object.getInterface(TEST_IFACE);
+  const cb = jest.fn();
+
+  expect(clientBus._nameOwners[testServiceName]).toEqual(testBus.name);
+
+  test.on('HelloWorld', cb);
+  test.on('SignalMultiple', cb);
+  test.on('SignalComplicated', cb);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(3);
+
+  await testBus.releaseName(testServiceName);
+  testBus.disconnect();
+
+  await waitForMessage(clientBus, { member: 'NameOwnerChanged' });
+  expect(clientBus._nameOwners[testServiceName]).toEqual('');
+
+  [testBus] = await createTestService(testServiceName);
+
+  await waitForMessage(clientBus, { member: 'NameOwnerChanged' });
+  expect(clientBus._nameOwners[testServiceName]).toEqual(testBus.name);
+
+  await test.EmitSignals();
+
+  expect(cb).toHaveBeenCalledTimes(6);
+
+  clientBus.disconnect();
+  testBus.disconnect();
 });
