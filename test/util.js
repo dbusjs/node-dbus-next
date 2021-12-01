@@ -10,6 +10,24 @@ async function ping (bus) {
   }));
 }
 
+/**
+ * Waits for a message that passes a filter on a provided bus.
+ */
+function waitForMessage(bus, messageFilter) {
+  return new Promise((resolve) => {
+    bus.on('message', (message) => {
+      const isMessageValid = Object.entries(messageFilter).every(
+        ([key, value]) => message[key] === value
+      );
+
+      if (isMessageValid) {
+        resolve();
+      }
+    });
+  });
+}
+
 module.exports = {
-  ping: ping
+  ping,
+  waitForMessage,
 };
