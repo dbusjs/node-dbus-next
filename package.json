@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "event-stream": "3.3.4",
-    "hexy": "^0.2.10",
     "jsbi": "^2.0.5",
     "long": "^4.0.0",
     "@nornagon/put": "0.0.8",
