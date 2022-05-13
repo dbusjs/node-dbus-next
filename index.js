@@ -24,6 +24,7 @@ module.exports.systemBus = function(opts) {
   if(!opts)
     opts = {};
   return createClient({
+    ...opts,
     negotiateUnixFd: opts.negotiateUnixFd,
     busAddress:
       process.env.DBUS_SYSTEM_BUS_ADDRESS ||
