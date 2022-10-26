@@ -69,3 +69,4 @@ module.exports.Variant = Variant;
 module.exports.Message = Message;
 module.exports.validators = require('./lib/validators');
 module.exports.DBusError = errors.DBusError;
+module.exports.MessageBus = MessageBus;
